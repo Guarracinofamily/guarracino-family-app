@@ -465,6 +465,217 @@
       }
 
 
+
+      var SPEND_CATEGORIES = ["Rent","Food & Groceries","Transport","Phone","Health Insurance","Social & Going Out","Books & Study","Clothing","Other"];
+      var SPEND_COLORS = {"Rent":"#1e6eb5","Food & Groceries":"#2d5a3d","Transport":"#7c3aed","Phone":"#b45309","Health Insurance":"#be185d","Social & Going Out":"#d97706","Books & Study":"#0891b2","Clothing":"#6b7280","Other":"#9ca3af"};
+
+      function SpendingTracker() {
+        var [entries, setEntries] = useState([]);
+        var [loading, setLoading] = useState(true);
+        var [showAdd, setShowAdd] = useState(false);
+        var [editEntry, setEditEntry] = useState(null);
+        var today = new Date();
+        var [viewMonth, setViewMonth] = useState(today.getMonth());
+        var [viewYear, setViewYear] = useState(today.getFullYear());
+
+        useEffect(function(){
+          supabase.from("spending").select("*").eq("person","Emanuel").order("spend_date",{ascending:false}).then(function(r){
+            setEntries(r.data || []);
+            setLoading(false);
+          });
+        }, []);
+
+        function addEntry(data) {
+          supabase.from("spending").insert([Object.assign({person:"Emanuel"},data)]).select().then(function(r){
+            if(r.data) setEntries(function(prev){return r.data.concat(prev);});
+          });
+        }
+
+        function updateEntry(id, data) {
+          supabase.from("spending").update(data).eq("id",id).then(function(){
+            setEntries(function(prev){return prev.map(function(e){return e.id===id?Object.assign({},e,data):e;});});
+          });
+        }
+
+        function deleteEntry(id) {
+          supabase.from("spending").delete().eq("id",id).then(function(){
+            setEntries(function(prev){return prev.filter(function(e){return e.id!==id;});});
+          });
+        }
+
+        // Filter to selected month
+        var monthEntries = entries.filter(function(e){
+          var d = new Date(e.spend_date);
+          return d.getMonth()===viewMonth && d.getFullYear()===viewYear;
+        });
+
+        var monthTotal = monthEntries.reduce(function(sum,e){return sum+parseFloat(e.amount);},0);
+
+        // Group by category for summary
+        var byCat = {};
+        monthEntries.forEach(function(e){
+          if (!byCat[e.category]) byCat[e.category] = 0;
+          byCat[e.category] += parseFloat(e.amount);
+        });
+        var catList = Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
+
+        var monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        function prevMonth() {
+          if (viewMonth===0) { setViewMonth(11); setViewYear(viewYear-1); }
+          else setViewMonth(viewMonth-1);
+        }
+        function nextMonth() {
+          if (viewMonth===11) { setViewMonth(0); setViewYear(viewYear+1); }
+          else setViewMonth(viewMonth+1);
+        }
+
+        return (
+          <div>
+            {/* Header */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <div>
+                <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a"}}>Emanuel's Spending</div>
+                <div style={{fontSize:12,color:"#9ca3af",marginTop:2}}>Monthly tracker</div>
+              </div>
+              <button onClick={function(){setEditEntry(null);setShowAdd(true);}} style={{padding:"8px 16px",background:"#1e6eb5",color:"#fff",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer"}}>+ Add</button>
+            </div>
+
+            {/* Month navigator */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"12px 16px",marginBottom:16}}>
+              <button onClick={prevMonth} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:"#6b7280",padding:"0 8px"}}>←</button>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#1a1a1a"}}>{monthNames[viewMonth]} {viewYear}</div>
+                <div style={{fontSize:22,fontWeight:700,color:"#1e6eb5",marginTop:2}}>EUR {monthTotal.toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+              </div>
+              <button onClick={nextMonth} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:"#6b7280",padding:"0 8px"}}>→</button>
+            </div>
+
+            {/* Category breakdown */}
+            {catList.length > 0 && (
+              <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"14px 16px",marginBottom:16}}>
+                <div style={{fontSize:12,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>By Category</div>
+                {catList.map(function(cat){
+                  var pct = Math.round((byCat[cat]/monthTotal)*100);
+                  var color = SPEND_COLORS[cat] || "#9ca3af";
+                  return (
+                    <div key={cat} style={{marginBottom:10}}>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                        <span style={{fontSize:13,color:"#374151"}}>{cat}</span>
+                        <span style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>EUR {byCat[cat].toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})} <span style={{fontSize:11,color:"#9ca3af",fontWeight:400}}>({pct}%)</span></span>
+                      </div>
+                      <div style={{height:6,background:"#f0ede8",borderRadius:3,overflow:"hidden"}}>
+                        <div style={{height:"100%",width:pct+"%",background:color,borderRadius:3,transition:"width 0.4s"}} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Entries list */}
+            {loading ? <div style={{textAlign:"center",padding:40,color:"#9ca3af"}}>Loading...</div> : (
+              <div>
+                {monthEntries.length===0 && (
+                  <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>
+                    <div style={{fontSize:32,marginBottom:12}}>💶</div>
+                    <div style={{fontSize:14,fontWeight:500,marginBottom:6}}>No spending logged</div>
+                    <div style={{fontSize:13}}>Tap + Add to log first expense</div>
+                  </div>
+                )}
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {monthEntries.map(function(e){
+                    var color = SPEND_COLORS[e.category] || "#9ca3af";
+                    return (
+                      <div key={e.id} onClick={function(){setEditEntry(e);setShowAdd(true);}} style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:10,padding:"12px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+                        <div style={{width:36,height:36,borderRadius:9,background:color+"18",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                          <div style={{width:10,height:10,borderRadius:5,background:color}} />
+                        </div>
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:14,fontWeight:500,color:"#1a1a1a"}}>{e.description || e.category}</div>
+                          <div style={{fontSize:11,color:"#9ca3af",marginTop:2}}>{e.category} · {new Date(e.spend_date).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</div>
+                        </div>
+                        <div style={{fontSize:15,fontWeight:700,color:"#1a1a1a"}}>EUR {parseFloat(e.amount).toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Add/Edit Modal */}
+            {showAdd && (
+              <SpendingModal
+                entry={editEntry}
+                onClose={function(){setShowAdd(false);setEditEntry(null);}}
+                onSave={function(data){ if(editEntry){updateEntry(editEntry.id,data);}else{addEntry(data);} setShowAdd(false);setEditEntry(null); }}
+                onDelete={function(id){deleteEntry(id);setShowAdd(false);setEditEntry(null);}}
+              />
+            )}
+          </div>
+        );
+      }
+
+      function SpendingModal(props) {
+        var entry = props.entry;
+        var isEdit = !!entry;
+        var [amount, setAmount] = useState(entry ? String(entry.amount) : "");
+        var [category, setCategory] = useState(entry ? entry.category : SPEND_CATEGORIES[0]);
+        var [description, setDescription] = useState(entry ? entry.description : "");
+        var [spendDate, setSpendDate] = useState(entry ? entry.spend_date : new Date().toISOString().split("T")[0]);
+        var [confirm, setConfirm] = useState(false);
+
+        function handleSave() {
+          if (!amount || isNaN(parseFloat(amount))) return;
+          props.onSave({amount:parseFloat(amount),category:category,description:description,spend_date:spendDate});
+        }
+
+        return (
+          <div className="modal-overlay" onClick={function(e){if(e.target===e.currentTarget)props.onClose();}}>
+            <div className="modal-box">
+              <div className="modal-title">{isEdit?"Edit expense":"Add expense"}</div>
+              <div className="form-field">
+                <label className="form-label">Amount (EUR)</label>
+                <input className="form-input" type="number" placeholder="0.00" value={amount} onChange={function(e){setAmount(e.target.value);}} autoFocus style={{fontSize:22,fontWeight:700}} />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Category</label>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  {SPEND_CATEGORIES.map(function(cat){
+                    var color = SPEND_COLORS[cat] || "#9ca3af";
+                    return (
+                      <button key={cat} onClick={function(){setCategory(cat);}} style={{padding:"5px 12px",borderRadius:20,fontSize:12,fontWeight:500,cursor:"pointer",background:category===cat?color:"#fff",color:category===cat?"#fff":color,border:"1.5px solid "+color}}>
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Description (optional)</label>
+                <input className="form-input" placeholder="e.g. Albert Heijn weekly shop" value={description} onChange={function(e){setDescription(e.target.value);}} />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Date</label>
+                <input className="form-input" type="date" value={spendDate} onChange={function(e){setSpendDate(e.target.value);}} />
+              </div>
+              <button className="btn-primary" onClick={handleSave}>{isEdit?"Save changes":"Add expense"}</button>
+              {isEdit && !confirm && <button className="btn-danger" onClick={function(){setConfirm(true);}}>Delete expense</button>}
+              {isEdit && confirm && (
+                <div style={{background:"#fef2f2",border:"1.5px solid #fecaca",borderRadius:12,padding:"14px 16px",marginTop:8}}>
+                  <div style={{fontSize:13,fontWeight:600,color:"#dc2626",marginBottom:10}}>Delete this expense?</div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={function(){props.onDelete(entry.id);}} style={{flex:1,padding:"10px",background:"#dc2626",color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer"}}>Yes, delete</button>
+                    <button onClick={function(){setConfirm(false);}} style={{flex:1,padding:"10px",background:"#fff",color:"#374151",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:13,cursor:"pointer"}}>Cancel</button>
+                  </div>
+                </div>
+              )}
+              <button className="btn-cancel" onClick={props.onClose}>Cancel</button>
+            </div>
+          </div>
+        );
+      }
+
       var APPT_STATUSES = [
         {key:"considering", label:"Considering", color:"#6b7280", bg:"#f3f4f6"},
         {key:"viewing",     label:"Viewing",     color:"#d97706", bg:"#fef3c7"},
@@ -986,7 +1197,7 @@
                 </div>
 
                 <div style={{display:"flex"}}>
-                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["budget","Budget"]].map(function(item){
+                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["spending","Spending"],["budget","Budget"]].map(function(item){
                     return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280"}}>{item[1]}</button>;
                   })}
                 </div>
@@ -1052,6 +1263,7 @@
 
               {activeTab==="timeline" && <Timeline />}
               {activeTab==="apartments" && <ApartmentTracker />}
+              {activeTab==="spending" && <SpendingTracker />}
 
               {activeTab==="housing" && (
                 <div>
