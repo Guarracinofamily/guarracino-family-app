@@ -301,11 +301,21 @@
         );
       }
 
+      function DueLabel({due}) {
+        const days = daysUntil(due);
+        const isNear = days !== null && days <= 7 && days >= 0;
+        const isOverdue = days !== null && days < 0;
+        const suffix = days === null ? "" : isOverdue ? " · overdue" : days === 0 ? " · today" : " · in " + days + "d";
+        return <span style={{fontSize:11,color:isOverdue?"#dc2626":isNear?"#d97706":"#9ca3af",fontWeight:isNear||isOverdue?600:400}}>{due}{suffix}</span>;
+      }
+
       function TaskCard({task, onToggle, onEdit, onAddNote}) {
         const [completing, setCompleting] = useState(false);
         const [expanded, setExpanded] = useState(false);
         const pressTimer = useRef(null);
         const c = OWNER_COLORS[task.owner] || OWNER_COLORS.All;
+        let noteCount = 0;
+        try { noteCount = JSON.parse(task.notes_thread || "[]").length; } catch(e) {}
 
         function handlePressStart() {
           pressTimer.current = setTimeout(() => { onEdit(task); }, 600);
@@ -339,22 +349,13 @@
                 </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                   <span style={{fontSize:11,background:c.bg,color:c.text,padding:"2px 8px",borderRadius:10,fontWeight:500}}>{task.owner}</span>
-                  {task.due_date && (() => {
-                    const days = daysUntil(task.due_date);
-                    const isNear = days !== null && days <= 7 && days >= 0;
-                    const isOverdue = days !== null && days < 0;
-                    return (
-                      <span style={{fontSize:11,color:isOverdue?"#dc2626":isNear?"#d97706":"#9ca3af",fontWeight:isNear||isOverdue?600:400}}>
-                        {task.due_date}{days !== null ? (isOverdue ? " · overdue" : days === 0 ? " · today" : " · in " + days + "d") : ""}
-                      </span>
-                    );
-                  })()}
+                  {task.due_date && <DueLabel due={task.due_date} />}
                   {task.note && <span style={{fontSize:11,color:"#6b7280",fontStyle:"italic"}}>· {task.note}</span>}
                 </div>
               </div>
               <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"center"}}>
                 <button onClick={e => {e.stopPropagation();setExpanded(!expanded);}} style={{background:expanded?"#eff6ff":"#f8f9fa",border:"1px solid "+(expanded?"#bfdbfe":"#e5e7eb"),borderRadius:6,cursor:"pointer",fontSize:11,color:expanded?"#1e6eb5":"#9ca3af",padding:"3px 7px",fontWeight:500,display:"flex",alignItems:"center",gap:3}}>
-                  💬 {(() => { try { return JSON.parse(task.notes_thread||"[]").length; } catch(e) { return 0; } })()} {expanded ? "▲" : "▼"}
+                  💬 {noteCount} {expanded ? "▲" : "▼"}
                 </button>
                 <button onClick={e => {e.stopPropagation();onEdit(task);}} style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:6,cursor:"pointer",fontSize:11,color:"#9ca3af",padding:"3px 7px"}}>✏️</button>
               </div>
