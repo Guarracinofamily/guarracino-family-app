@@ -494,11 +494,12 @@
         var [pros, setPros] = useState(apt ? apt.pros : "");
         var [cons, setCons] = useState(apt ? apt.cons : "");
         var [notes, setNotes] = useState(apt ? apt.notes : "");
+        var [photoUrl, setPhotoUrl] = useState(apt ? apt.photo_url : "");
         var [confirm, setConfirm] = useState(false);
 
         function handleSave() {
           if (!name.trim()) return;
-          onSave({id:apt?apt.id:null, name:name.trim(), address, price, landlord, phone, link, status, pros, cons, notes});
+          onSave({id:apt?apt.id:null, name:name.trim(), address, price, landlord, phone, link, status, pros, cons, notes, photo_url:photoUrl});
           onClose();
         }
 
@@ -545,6 +546,12 @@
               <div className="form-field">
                 <label className="form-label">Listing URL</label>
                 <input className="form-input" placeholder="https://housinganywhere.com/..." value={link} onChange={function(e){setLink(e.target.value);}} />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Photo URL</label>
+                <input className="form-input" placeholder="Paste image link from Google Photos, WhatsApp..." value={photoUrl} onChange={function(e){setPhotoUrl(e.target.value);}} />
+                <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Share photo from Google Photos or WhatsApp, copy link, paste here</div>
+                {photoUrl && <img src={photoUrl} alt="Apartment" style={{width:"100%",borderRadius:8,marginTop:8,maxHeight:200,objectFit:"cover"}} onError={function(e){e.target.style.display="none";}} />}
               </div>
               <div style={{display:"flex",gap:10}}>
                 <div className="form-field" style={{flex:1}}>
@@ -667,6 +674,7 @@
                     )}
                     {apt.notes && <div style={{fontSize:11,color:"#6b7280",marginTop:6,fontStyle:"italic"}}>{apt.notes}</div>}
                     {apt.link && <div style={{fontSize:11,color:"#1e6eb5",marginTop:6}}>View listing →</div>}
+                    {apt.photo_url && <img src={apt.photo_url} alt={apt.name} style={{width:"100%",borderRadius:8,marginTop:8,maxHeight:160,objectFit:"cover"}} onError={function(e){e.target.style.display="none";}} />}
                   </div>
                 );
               })}
