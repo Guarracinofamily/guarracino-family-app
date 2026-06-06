@@ -337,6 +337,7 @@
         const [seeded, setSeeded] = useState(false);
         const [showInstall, setShowInstall] = useState(true);
         const [showDone, setShowDone] = useState(false);
+        const [quickFilter, setQuickFilter] = useState(null); // null | 'urgent' | 'done' | 'remaining'
 
         useEffect(() => {
           loadTasks();
@@ -387,8 +388,12 @@
           (activeCategory === "All Tasks" || t.category === activeCategory) &&
           (activeOwner === "All" || t.owner === activeOwner)
         );
-        const activeTasks = allFiltered.filter(t => !t.completed);
-        const doneTasks = allFiltered.filter(t => t.completed);
+        const activeTasks = allFiltered.filter(t => {
+          if (quickFilter === 'urgent') return t.urgent && !t.completed;
+          if (quickFilter === 'remaining') return !t.completed;
+          return !t.completed;
+        });
+        const doneTasks = quickFilter === 'urgent' || quickFilter === 'remaining' ? [] : allFiltered.filter(t => t.completed);
 
         const completedCount = tasks.filter(t => t.completed).length;
         const totalCount = tasks.length;
@@ -423,9 +428,20 @@
                   <div style={{height:"100%",width:progress+"%",background:"#1e6eb5",borderRadius:2,transition:"width 0.5s"}} />
                 </div>
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
-                  {urgentCount > 0 && <span style={{background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#92400e",fontWeight:500}}>⚡ {urgentCount} urgent</span>}
-                  <span style={{background:"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#166534",fontWeight:500}}>{completedCount} done</span>
-                  <span style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#6b7280",fontWeight:500}}>{totalCount - completedCount} remaining</span>
+                  {urgentCount > 0 && (
+                    <button onClick={() => { setQuickFilter(quickFilter==='urgent'?null:'urgent'); setActiveTab('tasks'); }}
+                      style={{background:quickFilter==='urgent'?"#f59e0b":"#fef3c7",border:"1px solid #fcd34d",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='urgent'?"#fff":"#92400e",fontWeight:500,cursor:"pointer"}}>
+                      ⚡ {urgentCount} urgent
+                    </button>
+                  )}
+                  <button onClick={() => { setQuickFilter(quickFilter==='done'?null:'done'); setShowDone(true); setActiveTab('tasks'); }}
+                    style={{background:quickFilter==='done'?"#166534":"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='done'?"#fff":"#166534",fontWeight:500,cursor:"pointer"}}>
+                    {completedCount} done
+                  </button>
+                  <button onClick={() => { setQuickFilter(quickFilter==='remaining'?null:'remaining'); setActiveTab('tasks'); }}
+                    style={{background:quickFilter==='remaining'?"#374151":"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='remaining'?"#fff":"#6b7280",fontWeight:500,cursor:"pointer"}}>
+                    {totalCount - completedCount} remaining
+                  </button>
                 </div>
                 <div style={{display:"flex"}}>
                   {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["budget","Budget"]].map(([key,label]) => (
@@ -453,14 +469,24 @@
 
                   {loading ? <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>Loading...</div> : (
                     <div>
-                      {activeTasks.length === 0 && doneTasks.length === 0 && (
+                      {activeTasks.length === 0 && doneTasks.length === 0 && quickFilter !== 'done' && (
                         <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No tasks here.</div>
                       )}
-                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      {quickFilter === 'done' && (
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                          {allFiltered.filter(t=>t.completed).length === 0
+                            ? <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No completed tasks yet.</div>
+                            : allFiltered.filter(t=>t.completed).map(task => (
+                              <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
+                            ))
+                          }
+                        </div>
+                      )}
+                      {quickFilter !== 'done' && <div style={{display:"flex",flexDirection:"column",gap:8}}>
                         {activeTasks.map(task => (
                           <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
                         ))}
-                      </div>
+                      </div>}
 
                       {doneTasks.length > 0 && (
                         <div>
