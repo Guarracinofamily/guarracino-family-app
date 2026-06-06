@@ -1411,7 +1411,7 @@
         var progress = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
 
         return (
-          <div style={{minHeight:"100vh",background:"#f4f6f8",paddingBottom:80,paddingTop:showInstall?46:0}}>
+          <div style={{minHeight:"100vh",background:"#f4f6f8",paddingBottom:80,paddingTop:showInstall?46:0,maxWidth:"100vw",overflowX:"hidden"}}>
 
             {showInstall && (
               <div className="install-banner">
@@ -1420,7 +1420,7 @@
               </div>
             )}
 
-            <div style={{background:"#fff",borderBottom:"1px solid #e5e3df",padding:"0 20px",position:"sticky",top:showInstall?46:0,zIndex:10,width:"100%",left:0,right:0}}>
+            <div style={{background:"#fff",borderBottom:"1px solid #e5e3df",padding:"0 20px",position:"sticky",top:showInstall?46:0,zIndex:10,width:"100vw",marginLeft:0,boxSizing:"border-box"}}>
               <div style={{maxWidth:860,margin:"0 auto"}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0 10px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -1457,7 +1457,7 @@
                   </button>
                 </div>
 
-                <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
+                <div className="tab-scroll" style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none",width:"100%"}}>
                   {[["today","Overview"],["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["spending","Spending"],["budget","Budget"]].map(function(item){
                     return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280",flexShrink:0,whiteSpace:"nowrap"}}>{item[1]}</button>;
                   })}
