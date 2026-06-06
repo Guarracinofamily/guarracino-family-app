@@ -14,10 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; } @media (max-width: 480px) { .modal-box { padding: 20px 16px 32px; } }
+      body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
       button { font-family: inherit; } a { text-decoration: none; }
       input, textarea, select { font-family: inherit; }
-
       .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; justify-content: center; z-index: 100; }
       .modal-box { background: #fff; border-radius: 20px 20px 0 0; padding: 28px 24px 40px; width: 100%; max-width: 600px; animation: slideup 0.25s ease; max-height: 90vh; overflow-y: auto; }
       @keyframes slideup { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -26,25 +25,17 @@
       .form-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
       .form-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 14px; color: #1a1a1a; outline: none; }
       .form-input:focus { border-color: #1e6eb5; }
-      .form-textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 14px; color: #1a1a1a; outline: none; resize: none; min-height: 80px; }
-      .form-textarea:focus { border-color: #1e6eb5; }
       .form-select { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 14px; color: #1a1a1a; outline: none; background: #fff; }
       .btn-primary { width: 100%; padding: 14px; background: #1e6eb5; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
       .btn-danger { width: 100%; padding: 12px; background: none; color: #dc2626; border: 1.5px solid #fecaca; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 4px; }
       .btn-cancel { width: 100%; padding: 12px; background: none; color: #6b7280; border: none; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 4px; }
-      .add-fab { position: fixed; bottom: 28px; right: 24px; width: 56px; height: 56px; border-radius: 28px; background: #1e6eb5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(30,110,181,0.4); z-index: 50; transition: transform 0.15s; }
-      .add-fab:active { transform: scale(0.93); }
-      .install-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: #1e6eb5; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-      .task-card { background: #fff; border: 1px solid #e5e3df; border-radius: 10px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.15s; user-select: none; }
-      .task-card:active { transform: scale(0.99); }
-      .note-bubble { background: #f0f7ff; border-radius: 8px; padding: 8px 12px; margin-top: 6px; font-size: 12px; color: #374151; border-left: 3px solid #1e6eb5; }
+      .add-fab { position: fixed; bottom: 28px; right: 24px; width: 56px; height: 56px; border-radius: 28px; background: #1e6eb5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(30,110,181,0.4); z-index: 50; }
+      .install-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: #1e6eb5; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .note-bubble { background: #f0f7ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 12px; color: #374151; border-left: 3px solid #1e6eb5; }
       .note-input-row { display: flex; gap: 8px; margin-top: 8px; }
       .note-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 13px; outline: none; }
       .note-input:focus { border-color: #1e6eb5; }
-      .note-send-btn { padding: 8px 14px; background: #1e6eb5; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap; }
-      .timeline-dot { width: 12px; height: 12px; border-radius: 6px; flex-shrink: 0; margin-top: 4px; }
-      .timeline-line { width: 2px; background: #e5e7eb; flex-shrink: 0; margin: 0 5px; }
-      .section-header { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; }
+      .note-send-btn { padding: 8px 14px; background: #1e6eb5; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
     </style>
   </head>
   <body>
@@ -64,41 +55,53 @@
       };
 
       const CATEGORIES = ["University & Enrollment","Housing","Documents & Admin","Travel & Move","Life in Amsterdam"];
-      const ALL_CATEGORIES = ["All Tasks",...CATEGORIES];
+      const ALL_CATEGORIES = ["All Tasks"].concat(CATEGORIES);
       const OWNERS = ["All","Francesco","Mamma","Emanuel"];
 
       const KEY_DATES = [
-        { date: "2 Jul 2026", label: "Family flies Dubai → Italy", color: "#6b7280", urgent: false },
-        { date: "5 Jul 2026", label: "IB results released", color: "#dc2626", urgent: true },
-        { date: "5 Jul 2026", label: "Email VU with transcript", color: "#dc2626", urgent: true },
-        { date: "7 Jul 2026", label: "Pay VU tuition (2,700 EUR)", color: "#1e6eb5", urgent: false },
-        { date: "1 Aug 2026", label: "Send IB diploma to VU by post", color: "#7c3aed", urgent: false },
-        { date: "Late Aug 2026", label: "Emanuel flies Sicily → Amsterdam", color: "#b45309", urgent: false },
-        { date: "Day 1 in NL", label: "Arrange Dutch health insurance", color: "#dc2626", urgent: true },
-        { date: "Within 5 days", label: "Register for BSN number", color: "#dc2626", urgent: true },
-        { date: "31 Aug 2026", label: "Confirm enrolment on Studielink", color: "#7c3aed", urgent: false },
+        { date: "2 Jul 2026", label: "Family flies Dubai to Italy", urgent: false },
+        { date: "5 Jul 2026", label: "IB results released", urgent: true },
+        { date: "5 Jul 2026", label: "Email VU with transcript", urgent: true },
+        { date: "7 Jul 2026", label: "Pay VU tuition 2,700 EUR", urgent: false },
+        { date: "1 Aug 2026", label: "Send IB diploma to VU by post", urgent: false },
+        { date: "Late Aug 2026", label: "Emanuel flies Sicily to Amsterdam", urgent: false },
+        { date: "Day 1 in NL", label: "Arrange Dutch health insurance", urgent: true },
+        { date: "Within 5 days", label: "Register for BSN number", urgent: true },
+        { date: "31 Aug 2026", label: "Confirm enrolment on Studielink", urgent: false },
       ];
 
       const HOUSING_AGENCIES = [
-        { name: "HousingAnywhere", badge: "VU Partner", desc: "20% discount via vip@housinganywhere.com. Verified, secure payments.", url: "https://housinganywhere.com", color: "#1e6eb5" },
-        { name: "Room.nl / DUWO", badge: "Free", desc: "Official Dutch student housing. Register immediately — queue-based.", url: "https://room.nl", color: "#2d5a3d" },
-        { name: "Spotahome", badge: "Verified visits", desc: "Team physically visits every property. Good for remote booking.", url: "https://spotahome.com/amsterdam", color: "#7c3aed" },
-        { name: "Kamernet", badge: "Set alerts", desc: "Largest NL platform. Set alerts 700-1,000 Amsterdam.", url: "https://kamernet.nl", color: "#b45309" },
-        { name: "Hospi Housing", badge: "VU Recommended", desc: "VU-recommended homestay. Verified host families. Free to use.", url: "https://hospihousing.com", color: "#be185d" },
+        { name: "HousingAnywhere", badge: "VU Partner", desc: "20% discount via vip@housinganywhere.com.", url: "https://housinganywhere.com", color: "#1e6eb5" },
+        { name: "Room.nl / DUWO", badge: "Free", desc: "Official Dutch student housing. Queue-based.", url: "https://room.nl", color: "#2d5a3d" },
+        { name: "Spotahome", badge: "Verified visits", desc: "Team physically visits every property.", url: "https://spotahome.com/amsterdam", color: "#7c3aed" },
+        { name: "Kamernet", badge: "Set alerts", desc: "Largest NL platform. Set alerts 700-1,000.", url: "https://kamernet.nl", color: "#b45309" },
+        { name: "Hospi Housing", badge: "VU Recommended", desc: "VU-recommended homestay. Free to use.", url: "https://hospihousing.com", color: "#be185d" },
       ];
 
       const ONE_OFF = [
-        {item:"Flight Sicily to Amsterdam",eur:"150-250",who:"Francesco"},{item:"VU tuition fee year 1",eur:"2,700",who:"Francesco"},
-        {item:"Housing deposit",eur:"800-2,000",who:"Francesco"},{item:"First month rent",eur:"800-1,000",who:"Francesco"},
-        {item:"VU housing application fee",eur:"500",who:"Done"},{item:"HousingAnywhere subscription",eur:"26-55",who:"Emanuel"},
-        {item:"Bedding and essentials IKEA",eur:"200-300",who:"Francesco"},{item:"Books and study materials",eur:"200-400",who:"Emanuel"},
-        {item:"OV-chipkaart + load",eur:"50",who:"Emanuel"},{item:"Dutch SIM card",eur:"20-30",who:"Emanuel"},
-        {item:"Health insurance first month",eur:"130-150",who:"Francesco"},{item:"Apostille documents",eur:"100-200",who:"Francesco"},
+        {item:"Flight Sicily to Amsterdam",eur:"150-250",who:"Francesco"},
+        {item:"VU tuition fee year 1",eur:"2,700",who:"Francesco"},
+        {item:"Housing deposit",eur:"800-2,000",who:"Francesco"},
+        {item:"First month rent",eur:"800-1,000",who:"Francesco"},
+        {item:"VU housing application fee",eur:"500",who:"Done"},
+        {item:"HousingAnywhere subscription",eur:"26-55",who:"Emanuel"},
+        {item:"Bedding and essentials IKEA",eur:"200-300",who:"Francesco"},
+        {item:"Books and study materials",eur:"200-400",who:"Emanuel"},
+        {item:"OV-chipkaart + load",eur:"50",who:"Emanuel"},
+        {item:"Dutch SIM card",eur:"20-30",who:"Emanuel"},
+        {item:"Health insurance first month",eur:"130-150",who:"Francesco"},
+        {item:"Apostille documents",eur:"100-200",who:"Francesco"},
         {item:"Misc buffer",eur:"300",who:"-"},
       ];
+
       const MONTHLY = [
-        {item:"Rent",eur:"800-1,000"},{item:"Food and groceries",eur:"200-250"},{item:"Public transport",eur:"80-100"},
-        {item:"Phone",eur:"15-20"},{item:"Health insurance",eur:"130-150"},{item:"Social / going out",eur:"150-200"},{item:"Books and misc",eur:"50-100"},
+        {item:"Rent",eur:"800-1,000"},
+        {item:"Food and groceries",eur:"200-250"},
+        {item:"Public transport",eur:"80-100"},
+        {item:"Phone",eur:"15-20"},
+        {item:"Health insurance",eur:"130-150"},
+        {item:"Social / going out",eur:"150-200"},
+        {item:"Books and misc",eur:"50-100"},
       ];
 
       const INITIAL_TASKS = [
@@ -130,99 +133,160 @@
         {task_text:"Set up monthly allowance transfer",category:"Life in Amsterdam",owner:"Francesco",due_date:"Before Emanuel arrives",urgent:false,note:"Target AED 8,000-10,000/month depending on rent",completed:false,notes_thread:"[]"},
       ];
 
-      function GIcon({size=44}) {
+      function GIcon(props) {
+        var size = props.size || 44;
         return (
-          <svg width={size} height={size} viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="48" fill="#1e6eb5"/>
-            <circle cx="50" cy="50" r="44" fill="none" stroke="#d4af6a" strokeWidth="1.5"/>
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffffff" strokeWidth="0.8" opacity="0.2"/>
-            <circle cx="50" cy="50" r="32" fill="none" stroke="#ffffff" strokeWidth="0.4" opacity="0.12"/>
-            <text x="50" y="57" fontFamily="Futura,Century Gothic,Trebuchet MS,sans-serif" fontSize="52" fontWeight="300" fill="#ffffff" textAnchor="middle" dominantBaseline="middle">G</text>
-            <line x1="33" y1="72" x2="67" y2="72" stroke="#d4af6a" strokeWidth="1"/>
-            <text x="50" y="81" fontFamily="Futura,Century Gothic,sans-serif" fontSize="8" fontWeight="400" fill="#d4af6a" textAnchor="middle" letterSpacing="3">FAMILY</text>
-          </svg>
+          React.createElement('svg', {width:size,height:size,viewBox:"0 0 100 100"},
+            React.createElement('circle', {cx:50,cy:50,r:48,fill:"#1e6eb5"}),
+            React.createElement('circle', {cx:50,cy:50,r:44,fill:"none",stroke:"#d4af6a",strokeWidth:1.5}),
+            React.createElement('circle', {cx:50,cy:50,r:38,fill:"none",stroke:"#ffffff",strokeWidth:0.8,opacity:0.2}),
+            React.createElement('text', {x:50,y:57,fontFamily:"Futura,Century Gothic,sans-serif",fontSize:52,fontWeight:300,fill:"#ffffff",textAnchor:"middle",dominantBaseline:"middle"}, "G"),
+            React.createElement('line', {x1:33,y1:72,x2:67,y2:72,stroke:"#d4af6a",strokeWidth:1}),
+            React.createElement('text', {x:50,y:81,fontFamily:"Futura,Century Gothic,sans-serif",fontSize:8,fontWeight:400,fill:"#d4af6a",textAnchor:"middle",letterSpacing:3}, "FAMILY")
+          )
         );
       }
 
-      function TaskModal({task, onClose, onSave, onDelete}) {
-        const [text, setText] = useState(task ? task.task_text : "");
-        const [category, setCategory] = useState(task ? task.category : CATEGORIES[0]);
-        const [owner, setOwner] = useState(task ? task.owner : "Emanuel");
-        const [dueDate, setDueDate] = useState(task ? task.due_date : "");
-        const [note, setNote] = useState(task ? task.note : "");
-        const [urgent, setUrgent] = useState(task ? task.urgent : false);
-        const [saving, setSaving] = useState(false);
-        const [confirmDelete, setConfirmDelete] = useState(false);
-        const isEdit = !!task;
+      function NotesThread(props) {
+        var task = props.task;
+        var onAddNote = props.onAddNote;
+        var notes = [];
+        try { notes = JSON.parse(task.notes_thread || "[]"); } catch(e) {}
+        var [noteText, setNoteText] = useState("");
+        var [adding, setAdding] = useState(false);
+        var [editingIndex, setEditingIndex] = useState(null);
+        var [editText, setEditText] = useState("");
 
-        async function handleSave() {
+        function handleAdd() {
+          if (!noteText.trim()) return;
+          setAdding(true);
+          var d = new Date();
+          var newNote = { text: noteText.trim(), author: "Family", time: d.getDate() + " " + d.toLocaleString('en',{month:'short'}) + " " + d.getHours() + ":" + String(d.getMinutes()).padStart(2,'0') };
+          var updated = notes.concat([newNote]);
+          onAddNote(task.id, JSON.stringify(updated));
+          setNoteText("");
+          setAdding(false);
+        }
+
+        function handleDelete(index) {
+          var updated = notes.filter(function(_,i){ return i !== index; });
+          onAddNote(task.id, JSON.stringify(updated));
+        }
+
+        function handleEdit(index) {
+          if (!editText.trim()) return;
+          var updated = notes.map(function(n,i){ return i === index ? Object.assign({},n,{text:editText.trim(),edited:true}) : n; });
+          onAddNote(task.id, JSON.stringify(updated));
+          setEditingIndex(null);
+          setEditText("");
+        }
+
+        return (
+          <div style={{marginTop:8}} onClick={function(e){e.stopPropagation();}}>
+            {notes.map(function(n,i) {
+              return (
+                <div key={i} className="note-bubble">
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:11,color:"#9ca3af"}}>{n.author} - {n.time}{n.edited?" (edited)":""}</span>
+                    <div style={{display:"flex",gap:8}}>
+                      <button onClick={function(){setEditingIndex(i);setEditText(n.text);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#9ca3af"}}>edit</button>
+                      <button onClick={function(){handleDelete(i);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#fca5a5"}}>delete</button>
+                    </div>
+                  </div>
+                  {editingIndex === i ? (
+                    <div style={{display:"flex",gap:6}}>
+                      <input className="note-input" value={editText} onChange={function(e){setEditText(e.target.value);}} style={{flex:1}} autoFocus />
+                      <button className="note-send-btn" onClick={function(){handleEdit(i);}}>Save</button>
+                      <button onClick={function(){setEditingIndex(null);}} style={{padding:"8px 10px",background:"none",border:"1.5px solid #e5e7eb",borderRadius:8,cursor:"pointer",fontSize:12}}>x</button>
+                    </div>
+                  ) : (
+                    <div style={{fontSize:13}}>{n.text}</div>
+                  )}
+                </div>
+              );
+            })}
+            <div className="note-input-row">
+              <input className="note-input" placeholder="Add update..." value={noteText} onChange={function(e){setNoteText(e.target.value);}} onKeyDown={function(e){if(e.key==="Enter")handleAdd();}} />
+              <button className="note-send-btn" onClick={handleAdd} disabled={adding}>{adding?"...":"Add"}</button>
+            </div>
+          </div>
+        );
+      }
+
+      function TaskModal(props) {
+        var task = props.task;
+        var onClose = props.onClose;
+        var onSave = props.onSave;
+        var onDelete = props.onDelete;
+        var isEdit = !!task;
+        var [text, setText] = useState(task ? task.task_text : "");
+        var [category, setCategory] = useState(task ? task.category : CATEGORIES[0]);
+        var [owner, setOwner] = useState(task ? task.owner : "Emanuel");
+        var [dueDate, setDueDate] = useState(task ? task.due_date : "");
+        var [note, setNote] = useState(task ? task.note : "");
+        var [urgent, setUrgent] = useState(task ? task.urgent : false);
+        var [saving, setSaving] = useState(false);
+        var [confirmDelete, setConfirmDelete] = useState(false);
+
+        function handleSave() {
           if (!text.trim()) return;
           setSaving(true);
-          await onSave({
-            ...(task || {}),
-            task_text: text.trim(), category, owner,
-            due_date: dueDate, note, urgent,
-            completed: task ? task.completed : false,
-            notes_thread: task ? task.notes_thread : "[]"
-          });
+          onSave(Object.assign({}, task||{}, {task_text:text.trim(),category:category,owner:owner,due_date:dueDate,note:note,urgent:urgent,completed:task?task.completed:false,notes_thread:task?task.notes_thread:"[]"}));
           setSaving(false);
           onClose();
         }
 
-        async function handleDelete() {
-          if (!confirmDelete) { setConfirmDelete(true); return; }
-          await onDelete(task.id);
+        function handleDelete() {
+          onDelete(task.id);
           onClose();
         }
 
         return (
-          <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+          <div className="modal-overlay" onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
             <div className="modal-box">
-              <div className="modal-title">{isEdit ? "Edit task" : "Add new task"}</div>
+              <div className="modal-title">{isEdit?"Edit task":"Add new task"}</div>
               <div className="form-field">
                 <label className="form-label">Task</label>
-                <input className="form-input" placeholder="What needs to be done?" value={text} onChange={e => setText(e.target.value)} autoFocus />
+                <input className="form-input" placeholder="What needs to be done?" value={text} onChange={function(e){setText(e.target.value);}} autoFocus />
               </div>
               <div className="form-field">
                 <label className="form-label">Category</label>
-                <select className="form-select" value={category} onChange={e => setCategory(e.target.value)}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                <select className="form-select" value={category} onChange={function(e){setCategory(e.target.value);}}>
+                  {CATEGORIES.map(function(c){return <option key={c} value={c}>{c}</option>;})}
                 </select>
               </div>
               <div style={{display:"flex",gap:10}}>
                 <div className="form-field" style={{flex:1}}>
                   <label className="form-label">Owner</label>
-                  <select className="form-select" value={owner} onChange={e => setOwner(e.target.value)}>
-                    {["Francesco","Mamma","Emanuel","All"].map(o => <option key={o} value={o}>{o}</option>)}
+                  <select className="form-select" value={owner} onChange={function(e){setOwner(e.target.value);}}>
+                    {["Francesco","Mamma","Emanuel","All"].map(function(o){return <option key={o} value={o}>{o}</option>;})}
                   </select>
                 </div>
                 <div className="form-field" style={{flex:1}}>
                   <label className="form-label">Due date</label>
-                  <input className="form-input" placeholder="e.g. Jul 2026" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                  <input className="form-input" placeholder="e.g. Jul 2026" value={dueDate} onChange={function(e){setDueDate(e.target.value);}} />
                 </div>
               </div>
               <div className="form-field">
                 <label className="form-label">Note</label>
-                <input className="form-input" placeholder="Any extra detail..." value={note} onChange={e => setNote(e.target.value)} />
+                <input className="form-input" placeholder="Any extra detail..." value={note} onChange={function(e){setNote(e.target.value);}} />
               </div>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-                <div onClick={() => setUrgent(!urgent)} style={{width:44,height:26,borderRadius:13,cursor:"pointer",background:urgent?"#f59e0b":"#e5e7eb",position:"relative",transition:"background 0.2s"}}>
+                <div onClick={function(){setUrgent(!urgent);}} style={{width:44,height:26,borderRadius:13,cursor:"pointer",background:urgent?"#f59e0b":"#e5e7eb",position:"relative",transition:"background 0.2s"}}>
                   <div style={{width:20,height:20,borderRadius:10,background:"#fff",position:"absolute",top:3,left:urgent?21:3,transition:"left 0.2s"}} />
                 </div>
                 <span style={{fontSize:13,color:"#374151"}}>Mark as urgent</span>
               </div>
-              <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : isEdit ? "Save changes" : "Add task"}</button>
+              <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving?"Saving...":isEdit?"Save changes":"Add task"}</button>
               {isEdit && !confirmDelete && (
-                <button className="btn-danger" onClick={() => setConfirmDelete(true)}>
-                  Delete task
-                </button>
+                <button className="btn-danger" onClick={function(){setConfirmDelete(true);}}>Delete task</button>
               )}
               {isEdit && confirmDelete && (
                 <div style={{background:"#fef2f2",border:"1.5px solid #fecaca",borderRadius:12,padding:"14px 16px",marginTop:8}}>
-                  <div style={{fontSize:13,fontWeight:600,color:"#dc2626",marginBottom:10}}>Delete this task permanently?</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#dc2626",marginBottom:10}}>Delete permanently?</div>
                   <div style={{display:"flex",gap:8}}>
                     <button onClick={handleDelete} style={{flex:1,padding:"10px",background:"#dc2626",color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer"}}>Yes, delete</button>
-                    <button onClick={() => setConfirmDelete(false)} style={{flex:1,padding:"10px",background:"#fff",color:"#374151",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:13,cursor:"pointer"}}>Cancel</button>
+                    <button onClick={function(){setConfirmDelete(false);}} style={{flex:1,padding:"10px",background:"#fff",color:"#374151",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:13,cursor:"pointer"}}>Cancel</button>
                   </div>
                 </div>
               )}
@@ -232,115 +296,32 @@
         );
       }
 
-      function NotesThread({task, onAddNote}) {
-        const [noteText, setNoteText] = useState("");
-        const [adding, setAdding] = useState(false);
-        const [editingIndex, setEditingIndex] = useState(null);
-        const [editText, setEditText] = useState("");
-        let notes = [];
-        try { notes = JSON.parse(task.notes_thread || "[]"); } catch(e) {}
-
-        async function handleAdd() {
-          if (!noteText.trim()) return;
-          setAdding(true);
-          const newNote = { text: noteText.trim(), author: "Family", time: new Date().toLocaleDateString("en-GB", {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) };
-          const updated = [...notes, newNote];
-          await onAddNote(task.id, JSON.stringify(updated));
-          setNoteText("");
-          setAdding(false);
-        }
-
-        async function handleDelete(index) {
-          const updated = notes.filter((_, i) => i !== index);
-          await onAddNote(task.id, JSON.stringify(updated));
-        }
-
-        async function handleEdit(index) {
-          if (!editText.trim()) return;
-          const updated = notes.map((n, i) => i === index ? {...n, text: editText.trim(), edited: true} : n);
-          await onAddNote(task.id, JSON.stringify(updated));
-          setEditingIndex(null);
-          setEditText("");
-        }
-
-        return (
-          <div style={{marginTop:8}} onClick={e => e.stopPropagation()}>
-            {notes.map((n, i) => (
-              <div key={i} className="note-bubble" style={{marginBottom:6}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-                  <span style={{fontSize:11,color:"#9ca3af"}}>{n.author} · {n.time}{n.edited ? " (edited)" : ""}</span>
-                  <div style={{display:"flex",gap:8}}>
-                    <button onClick={() => { setEditingIndex(i); setEditText(n.text); }}
-                      style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#9ca3af",padding:0}}>✏️</button>
-                    <button onClick={() => handleDelete(i)}
-                      style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#fca5a5",padding:0}}>✕</button>
-                  </div>
-                </div>
-                {editingIndex === i ? (
-                  <div style={{display:"flex",gap:6,marginTop:4}}>
-                    <input className="note-input" value={editText} onChange={e => setEditText(e.target.value)}
-                      onKeyDown={e => e.key === "Enter" && handleEdit(i)}
-                      style={{flex:1}} autoFocus />
-                    <button className="note-send-btn" onClick={() => handleEdit(i)}>Save</button>
-                    <button onClick={() => setEditingIndex(null)}
-                      style={{padding:"8px 10px",background:"none",border:"1.5px solid #e5e7eb",borderRadius:8,cursor:"pointer",fontSize:12,color:"#6b7280"}}>✕</button>
-                  </div>
-                ) : (
-                  <div style={{fontSize:13,color:"#374151"}}>{n.text}</div>
-                )}
-              </div>
-            ))}
-            <div className="note-input-row">
-              <input className="note-input" placeholder="Add update..." value={noteText} onChange={e => setNoteText(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleAdd()} />
-              <button className="note-send-btn" onClick={handleAdd} disabled={adding}>
-                {adding ? "..." : "Add"}
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      function DueLabel({due}) {
-        const days = daysUntil(due);
-        const isNear = days !== null && days <= 7 && days >= 0;
-        const isOverdue = days !== null && days < 0;
-        const suffix = days === null ? "" : isOverdue ? " · overdue" : days === 0 ? " · today" : " · in " + days + "d";
-        return <span style={{fontSize:11,color:isOverdue?"#dc2626":isNear?"#d97706":"#9ca3af",fontWeight:isNear||isOverdue?600:400}}>{due}{suffix}</span>;
-      }
-
-      function TaskCard({task, onToggle, onEdit, onAddNote}) {
-        const [completing, setCompleting] = useState(false);
-        const [expanded, setExpanded] = useState(false);
-        const pressTimer = useRef(null);
-        const c = OWNER_COLORS[task.owner] || OWNER_COLORS.All;
-        let noteCount = 0;
+      function TaskCard(props) {
+        var task = props.task;
+        var onToggle = props.onToggle;
+        var onEdit = props.onEdit;
+        var onAddNote = props.onAddNote;
+        var [expanded, setExpanded] = useState(false);
+        var [completing, setCompleting] = useState(false);
+        var c = OWNER_COLORS[task.owner] || OWNER_COLORS.All;
+        var noteCount = 0;
         try { noteCount = JSON.parse(task.notes_thread || "[]").length; } catch(e) {}
 
-        function handlePressStart() {
-          pressTimer.current = setTimeout(() => { onEdit(task); }, 600);
-        }
-        function handlePressEnd() {
-          clearTimeout(pressTimer.current);
-        }
-        async function handleComplete(e) {
+        function handleCheck(e) {
           e.stopPropagation();
           if (!task.completed) {
             setCompleting(true);
-            setTimeout(() => { onToggle(task.id, task.completed); setCompleting(false); }, 400);
+            setTimeout(function(){ onToggle(task.id, task.completed); setCompleting(false); }, 350);
           } else {
             onToggle(task.id, task.completed);
           }
         }
 
         return (
-          <div className="task-card" style={{flexDirection:"column",padding:0,opacity:task.completed ? 0.55 : 1}}>
-            <div style={{display:"flex",gap:12,alignItems:"flex-start",padding:"13px 16px"}}
-              onMouseDown={handlePressStart} onMouseUp={handlePressEnd}
-              onTouchStart={handlePressStart} onTouchEnd={handlePressEnd}>
-              <div onClick={handleComplete}
-                style={{width:36,height:36,borderRadius:9,flexShrink:0,marginTop:-2,background:completing?"#22c55e":task.completed?"#1e6eb5":"#fff",border:"2px solid "+(completing?"#22c55e":task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",minWidth:36,transition:"all 0.3s ease",transform:completing?"scale(1.15)":"scale(1)"}}>
-                {(task.completed||completing) && <span style={{color:"#fff",fontSize:15,fontWeight:700}}>✓</span>}
+          <div style={{background:task.completed?"#fafafa":"#fff",border:"1px solid "+(task.completed?"#f0ede8":"#e5e3df"),borderRadius:10,overflow:"hidden",boxShadow:task.completed?"none":"0 1px 3px rgba(0,0,0,0.04)",opacity:task.completed?0.6:1,transition:"opacity 0.3s"}}>
+            <div style={{display:"flex",gap:12,alignItems:"flex-start",padding:"13px 16px"}}>
+              <div onClick={handleCheck} style={{width:36,height:36,borderRadius:9,flexShrink:0,marginTop:-2,background:completing?"#22c55e":task.completed?"#1e6eb5":"#fff",border:"2px solid "+(completing?"#22c55e":task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",minWidth:36,transition:"all 0.3s"}}>
+                {(task.completed||completing) && <span style={{color:"#fff",fontSize:15,fontWeight:700}}>v</span>}
               </div>
               <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
@@ -349,15 +330,15 @@
                 </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                   <span style={{fontSize:11,background:c.bg,color:c.text,padding:"2px 8px",borderRadius:10,fontWeight:500}}>{task.owner}</span>
-                  {task.due_date && <DueLabel due={task.due_date} />}
-                  {task.note && <span style={{fontSize:11,color:"#6b7280",fontStyle:"italic"}}>· {task.note}</span>}
+                  {task.due_date && <span style={{fontSize:11,color:"#9ca3af"}}>{task.due_date}</span>}
+                  {task.note && <span style={{fontSize:11,color:"#6b7280",fontStyle:"italic"}}>- {task.note}</span>}
                 </div>
               </div>
               <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"center"}}>
-                <button onClick={e => {e.stopPropagation();setExpanded(!expanded);}} style={{background:expanded?"#eff6ff":"#f8f9fa",border:"1px solid "+(expanded?"#bfdbfe":"#e5e7eb"),borderRadius:6,cursor:"pointer",fontSize:11,color:expanded?"#1e6eb5":"#9ca3af",padding:"3px 7px",fontWeight:500,display:"flex",alignItems:"center",gap:3}}>
-                  💬 {noteCount} {expanded ? "▲" : "▼"}
+                <button onClick={function(e){e.stopPropagation();setExpanded(!expanded);}} style={{background:expanded?"#eff6ff":"#f8f9fa",border:"1px solid "+(expanded?"#bfdbfe":"#e5e7eb"),borderRadius:6,cursor:"pointer",fontSize:11,color:expanded?"#1e6eb5":"#9ca3af",padding:"3px 8px",fontWeight:500}}>
+                  Notes {noteCount > 0 ? "("+noteCount+")" : ""} {expanded?"^":"v"}
                 </button>
-                <button onClick={e => {e.stopPropagation();onEdit(task);}} style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:6,cursor:"pointer",fontSize:11,color:"#9ca3af",padding:"3px 7px"}}>✏️</button>
+                <button onClick={function(e){e.stopPropagation();onEdit(task);}} style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:6,cursor:"pointer",fontSize:11,color:"#6b7280",padding:"3px 8px"}}>Edit</button>
               </div>
             </div>
             {expanded && (
@@ -373,131 +354,131 @@
         return (
           <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"16px 20px"}}>
             <div style={{fontSize:15,fontWeight:600,color:"#1a1a1a",marginBottom:16}}>Key Dates</div>
-            {KEY_DATES.map((item, i) => (
-              <div key={i} style={{display:"flex",gap:0,marginBottom: i < KEY_DATES.length-1 ? 0 : 0}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",marginRight:12}}>
-                  <div className="timeline-dot" style={{background: item.urgent ? "#dc2626" : item.color}} />
-                  {i < KEY_DATES.length-1 && <div className="timeline-line" style={{height:36}} />}
+            {KEY_DATES.map(function(item,i){
+              return (
+                <div key={i} style={{display:"flex",gap:0}}>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",marginRight:12}}>
+                    <div style={{width:12,height:12,borderRadius:6,flexShrink:0,marginTop:4,background:item.urgent?"#dc2626":"#1e6eb5"}} />
+                    {i < KEY_DATES.length-1 && <div style={{width:2,height:36,background:"#e5e7eb",margin:"0 5px"}} />}
+                  </div>
+                  <div style={{paddingBottom:i < KEY_DATES.length-1?24:0}}>
+                    <div style={{fontSize:11,color:"#9ca3af",marginBottom:2}}>{item.date}</div>
+                    <div style={{fontSize:13,fontWeight:500,color:"#1a1a1a"}}>{item.label}</div>
+                  </div>
                 </div>
-                <div style={{paddingBottom: i < KEY_DATES.length-1 ? 24 : 0}}>
-                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:2}}>{item.date}</div>
-                  <div style={{fontSize:13,fontWeight:500,color:"#1a1a1a"}}>{item.label}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       }
 
-      function daysUntil(dueDateStr) {
-        if (!dueDateStr) return null;
-        const dateMap = {
-          'Immediately': 0, 'This week': 3, 'Book by end Jun 2026': 0,
-          '2 Jul 2026': Math.round((new Date('2026-07-02')-new Date())/86400000),
-          '5 Jul 2026': Math.round((new Date('2026-07-05')-new Date())/86400000),
-          'Week of 7 Jul 2026': Math.round((new Date('2026-07-07')-new Date())/86400000),
-          'Before Jul 2026': Math.round((new Date('2026-06-30')-new Date())/86400000),
-          'July 2026': Math.round((new Date('2026-07-31')-new Date())/86400000),
-          'Before 1 Aug 2026': Math.round((new Date('2026-08-01')-new Date())/86400000),
-          'Before 31 Aug 2026': Math.round((new Date('2026-08-31')-new Date())/86400000),
-          'August 2026': Math.round((new Date('2026-08-31')-new Date())/86400000),
-        };
-        return dateMap[dueDateStr] ?? null;
-      }
-
       function App() {
-        const [tasks, setTasks] = useState([]);
-        const [loading, setLoading] = useState(true);
-        const [activeTab, setActiveTab] = useState("tasks");
-        const [activeCategory, setActiveCategory] = useState("All Tasks");
-        const [activeOwner, setActiveOwner] = useState("All");
-        const [editingTask, setEditingTask] = useState(null);
-        const [showAdd, setShowAdd] = useState(false);
-        const [seeded, setSeeded] = useState(false);
-        const [showInstall, setShowInstall] = useState(true);
-        const [showDone, setShowDone] = useState(false);
-        const [quickFilter, setQuickFilter] = useState(null); // null | 'urgent' | 'done' | 'remaining'
-        const [sortBy, setSortBy] = useState('default'); // 'default' | 'deadline'
+        var [tasks, setTasks] = useState([]);
+        var [loading, setLoading] = useState(true);
+        var [activeTab, setActiveTab] = useState("tasks");
+        var [activeCategory, setActiveCategory] = useState("All Tasks");
+        var [activeOwner, setActiveOwner] = useState("All");
+        var [editingTask, setEditingTask] = useState(null);
+        var [showAdd, setShowAdd] = useState(false);
+        var [seeded, setSeeded] = useState(false);
+        var [showInstall, setShowInstall] = useState(true);
+        var [showDone, setShowDone] = useState(false);
+        var [quickFilter, setQuickFilter] = useState(null);
+        var [sortBy, setSortBy] = useState("default");
 
-        useEffect(() => {
+        useEffect(function(){
           loadTasks();
-          const ch = supabase.channel("tasks-v3")
-            .on("postgres_changes", {event:"*",schema:"public",table:"tasks"}, () => loadTasks())
+          var ch = supabase.channel("tasks-stable")
+            .on("postgres_changes",{event:"*",schema:"public",table:"tasks"},function(){loadTasks();})
             .subscribe();
-          return () => supabase.removeChannel(ch);
+          return function(){ supabase.removeChannel(ch); };
         }, []);
 
-        async function loadTasks() {
-          const {data, error} = await supabase.from("tasks").select("*").order("created_at");
-          if (error) { setLoading(false); return; }
-          if (data.length === 0 && !seeded) {
-            setSeeded(true);
-            await supabase.from("tasks").insert(INITIAL_TASKS);
-            const {data:d2} = await supabase.from("tasks").select("*").order("created_at");
-            setTasks(d2 || []);
-          } else { setTasks(data); }
-          setLoading(false);
+        function loadTasks() {
+          supabase.from("tasks").select("*").order("created_at").then(function(result){
+            var data = result.data;
+            var error = result.error;
+            if (error) { setLoading(false); return; }
+            if (data.length === 0 && !seeded) {
+              setSeeded(true);
+              supabase.from("tasks").insert(INITIAL_TASKS).then(function(){
+                supabase.from("tasks").select("*").order("created_at").then(function(r2){
+                  setTasks(r2.data || []);
+                  setLoading(false);
+                });
+              });
+            } else {
+              setTasks(data);
+              setLoading(false);
+            }
+          });
         }
 
-        async function toggleTask(id, completed) {
-          await supabase.from("tasks").update({completed: !completed}).eq("id", id);
-          setTasks(prev => prev.map(t => t.id === id ? {...t, completed: !completed} : t));
+        function toggleTask(id, completed) {
+          supabase.from("tasks").update({completed:!completed}).eq("id",id).then(function(){
+            setTasks(function(prev){ return prev.map(function(t){ return t.id===id ? Object.assign({},t,{completed:!completed}) : t; }); });
+          });
         }
 
-        async function saveTask(taskData) {
+        function saveTask(taskData) {
           if (taskData.id) {
-            await supabase.from("tasks").update(taskData).eq("id", taskData.id);
-            setTasks(prev => prev.map(t => t.id === taskData.id ? {...t, ...taskData} : t));
+            supabase.from("tasks").update(taskData).eq("id",taskData.id).then(function(){
+              setTasks(function(prev){ return prev.map(function(t){ return t.id===taskData.id ? Object.assign({},t,taskData) : t; }); });
+            });
           } else {
-            const {data} = await supabase.from("tasks").insert([taskData]).select();
-            if (data) setTasks(prev => [...prev, ...data]);
+            supabase.from("tasks").insert([taskData]).select().then(function(r){
+              if (r.data) setTasks(function(prev){ return prev.concat(r.data); });
+            });
           }
         }
 
-        async function deleteTask(id) {
-          await supabase.from("tasks").delete().eq("id", id);
-          setTasks(prev => prev.filter(t => t.id !== id));
+        function deleteTask(id) {
+          supabase.from("tasks").delete().eq("id",id).then(function(){
+            setTasks(function(prev){ return prev.filter(function(t){ return t.id!==id; }); });
+          });
         }
 
-        async function addNote(id, notesThread) {
-          await supabase.from("tasks").update({notes_thread: notesThread}).eq("id", id);
-          setTasks(prev => prev.map(t => t.id === id ? {...t, notes_thread: notesThread} : t));
+        function addNote(id, notesThread) {
+          supabase.from("tasks").update({notes_thread:notesThread}).eq("id",id).then(function(){
+            setTasks(function(prev){ return prev.map(function(t){ return t.id===id ? Object.assign({},t,{notes_thread:notesThread}) : t; }); });
+          });
         }
 
-        const allFiltered = tasks.filter(t =>
-          (activeCategory === "All Tasks" || t.category === activeCategory) &&
-          (activeOwner === "All" || t.owner === activeOwner)
-        );
-        const DATE_PRIORITY = {'Immediately':0,'This week':1,'Book by end Jun 2026':2,'2 Jul 2026':3,'5 Jul 2026':4,'Week of 7 Jul 2026':5,'Before Jul 2026':6,'July 2026':7,'Before 1 Aug 2026':8,'August 2026':9,'Before 31 Aug 2026':10,'Late Aug 2026':11,'As soon as found':12,'On contract signing':13,'Weekly check':14,'First week Amsterdam':15,'Day of arrival':16,'Within 5 days of arrival':17,'Before Emanuel arrives':18};
-        const activeTasks = allFiltered.filter(t => {
-          if (quickFilter === 'urgent') return t.urgent && !t.completed;
-          if (quickFilter === 'remaining') return !t.completed;
-          return !t.completed;
-        }).sort((a,b) => {
-          if (sortBy === 'deadline') {
-            const ap = a.urgent ? -1 : (DATE_PRIORITY[a.due_date] ?? 99);
-            const bp = b.urgent ? -1 : (DATE_PRIORITY[b.due_date] ?? 99);
-            return ap - bp;
-          }
-          return 0;
+        var allFiltered = tasks.filter(function(t){
+          return (activeCategory==="All Tasks" || t.category===activeCategory) && (activeOwner==="All" || t.owner===activeOwner);
         });
-        const doneTasks = quickFilter === 'urgent' || quickFilter === 'remaining' ? [] : allFiltered.filter(t => t.completed);
 
-        const completedCount = tasks.filter(t => t.completed).length;
-        const totalCount = tasks.length;
-        const urgentCount = tasks.filter(t => t.urgent && !t.completed).length;
-        const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+        var activeTasks = allFiltered.filter(function(t){
+          if (quickFilter==="urgent") return t.urgent && !t.completed;
+          return !t.completed;
+        });
+
+        if (sortBy==="deadline") {
+          var ORDER = {"Immediately":0,"This week":1,"Book by end Jun 2026":2,"2 Jul 2026":3,"5 Jul 2026":4,"Week of 7 Jul 2026":5,"Before Jul 2026":6,"July 2026":7,"Before 1 Aug 2026":8,"August 2026":9,"Before 31 Aug 2026":10,"Late Aug 2026":11,"As soon as found":12,"On contract signing":13,"Weekly check":14,"First week Amsterdam":15,"Day of arrival":16,"Within 5 days of arrival":17,"Before Emanuel arrives":18};
+          activeTasks = activeTasks.slice().sort(function(a,b){
+            var ap = a.urgent ? -1 : (ORDER[a.due_date] !== undefined ? ORDER[a.due_date] : 99);
+            var bp = b.urgent ? -1 : (ORDER[b.due_date] !== undefined ? ORDER[b.due_date] : 99);
+            return ap - bp;
+          });
+        }
+
+        var doneTasks = quickFilter==="urgent" ? [] : allFiltered.filter(function(t){ return t.completed; });
+        var completedCount = tasks.filter(function(t){ return t.completed; }).length;
+        var totalCount = tasks.length;
+        var urgentCount = tasks.filter(function(t){ return t.urgent && !t.completed; }).length;
+        var progress = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
 
         return (
-          <div style={{minHeight:"100vh",background:"#faf9f7",paddingBottom:80,paddingTop:showInstall?44:0}}>
+          <div style={{minHeight:"100vh",background:"#faf9f7",paddingBottom:80,paddingTop:showInstall?46:0}}>
+
             {showInstall && (
               <div className="install-banner">
-                <div style={{fontSize:13,fontWeight:500}}>Install on iPhone: tap Share then "Add to Home Screen"</div>
-                <button onClick={() => setShowInstall(false)} style={{background:"none",border:"none",color:"#fff",fontSize:20,cursor:"pointer",lineHeight:1}}>×</button>
+                <span style={{fontSize:13,fontWeight:500}}>Install on iPhone: tap Share then "Add to Home Screen"</span>
+                <button onClick={function(){setShowInstall(false);}} style={{background:"none",border:"none",color:"#fff",fontSize:20,cursor:"pointer",lineHeight:1}}>x</button>
               </div>
             )}
 
-            <div style={{background:"#fff",borderBottom:"1px solid #e5e3df",padding:"0 20px",position:"sticky",top:0,zIndex:10}}>
+            <div style={{background:"#fff",borderBottom:"1px solid #e5e3df",padding:"0 20px",position:"sticky",top:showInstall?46:0,zIndex:10}}>
               <div style={{maxWidth:860,margin:"0 auto"}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0 10px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -508,95 +489,88 @@
                     </div>
                   </div>
                   <div style={{textAlign:"right"}}>
-                    <div style={{fontSize:24,fontWeight:700,color:"#1e6eb5"}}>{progress}%</div>
+                    <div style={{fontSize:22,fontWeight:700,color:"#1e6eb5"}}>{progress}%</div>
                     <div style={{fontSize:11,color:"#9ca3af"}}>{completedCount}/{totalCount} done</div>
                   </div>
+                </div>
+
                 <div style={{marginBottom:10}}>
                   <div style={{height:10,background:"#e5e7eb",borderRadius:5,overflow:"hidden"}}>
                     <div style={{height:"100%",width:progress+"%",background:"linear-gradient(90deg,#60a5fa,#1e6eb5)",borderRadius:5,transition:"width 0.6s ease",minWidth:progress>0?"10px":"0"}} />
                   </div>
                   {progress > 0 && <div style={{fontSize:10,color:"#1e6eb5",fontWeight:600,textAlign:"right",marginTop:2}}>{progress}% complete</div>}
                 </div>
+
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
                   {urgentCount > 0 && (
-                    <button onClick={() => { setQuickFilter(quickFilter==='urgent'?null:'urgent'); setActiveTab('tasks'); }}
-                      style={{background:quickFilter==='urgent'?"#f59e0b":"#fef3c7",border:"1px solid #fcd34d",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='urgent'?"#fff":"#92400e",fontWeight:500,cursor:"pointer"}}>
-                      ⚡ {urgentCount} urgent
+                    <button onClick={function(){setQuickFilter(quickFilter==="urgent"?null:"urgent");setActiveTab("tasks");}} style={{background:quickFilter==="urgent"?"#f59e0b":"#fef3c7",border:"1px solid #fcd34d",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==="urgent"?"#fff":"#92400e",fontWeight:500,cursor:"pointer"}}>
+                      {urgentCount} urgent
                     </button>
                   )}
-                  <button onClick={() => { setQuickFilter(quickFilter==='done'?null:'done'); setShowDone(true); setActiveTab('tasks'); }}
-                    style={{background:quickFilter==='done'?"#166534":"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='done'?"#fff":"#166534",fontWeight:500,cursor:"pointer"}}>
+                  <button onClick={function(){setQuickFilter(quickFilter==="done"?null:"done");setShowDone(true);setActiveTab("tasks");}} style={{background:quickFilter==="done"?"#166534":"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==="done"?"#fff":"#166534",fontWeight:500,cursor:"pointer"}}>
                     {completedCount} done
                   </button>
                   <span style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#6b7280",fontWeight:500}}>
-                    {totalCount - completedCount} remaining
+                    {totalCount-completedCount} remaining
                   </span>
                 </div>
+
                 <div style={{display:"flex"}}>
-                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["budget","Budget"]].map(([key,label]) => (
-                    <button key={key} onClick={() => setActiveTab(key)} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===key?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===key?"#1e6eb5":"#6b7280"}}>{label}</button>
-                  ))}
+                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["budget","Budget"]].map(function(item){
+                    return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280"}}>{item[1]}</button>;
+                  })}
                 </div>
               </div>
             </div>
 
             <div style={{maxWidth:860,margin:"0 auto",padding:"20px"}}>
 
-              {activeTab === "tasks" && (
+              {activeTab==="tasks" && (
                 <div>
                   <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
-                    {OWNERS.map(owner => {
-                      const c = OWNER_COLORS[owner] || OWNER_COLORS.All;
-                      return <button key={owner} onClick={() => setActiveOwner(owner)} style={{padding:"5px 14px",borderRadius:20,fontSize:12,fontWeight:500,cursor:"pointer",background:activeOwner===owner?(owner==="All"?"#1a1a1a":c.bg):"#fff",color:activeOwner===owner?(owner==="All"?"#fff":c.text):"#6b7280",border:"1.5px solid "+(activeOwner===owner?(owner==="All"?"#1a1a1a":c.border):"#e5e7eb")}}>{owner}</button>;
+                    {OWNERS.map(function(owner){
+                      var c = OWNER_COLORS[owner] || OWNER_COLORS.All;
+                      return <button key={owner} onClick={function(){setActiveOwner(owner);}} style={{padding:"5px 14px",borderRadius:20,fontSize:12,fontWeight:500,cursor:"pointer",background:activeOwner===owner?(owner==="All"?"#1a1a1a":c.bg):"#fff",color:activeOwner===owner?(owner==="All"?"#fff":c.text):"#6b7280",border:"1.5px solid "+(activeOwner===owner?(owner==="All"?"#1a1a1a":c.border):"#e5e7eb")}}>{owner}</button>;
                     })}
                   </div>
+
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                    <div style={{fontSize:11,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"0.5px"}}>Sort</div>
-                    <div style={{display:"flex",gap:6}}>
-                      <button onClick={()=>setSortBy('default')} style={{padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:sortBy==='default'?"#1e6eb5":"#fff",color:sortBy==='default'?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==='default'?"#1e6eb5":"#e5e7eb")}}>Default</button>
-                      <button onClick={()=>setSortBy('deadline')} style={{padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:sortBy==='deadline'?"#1e6eb5":"#fff",color:sortBy==='deadline'?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==='deadline'?"#1e6eb5":"#e5e7eb")}}>By deadline</button>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                      {ALL_CATEGORIES.map(function(cat){
+                        return <button key={cat} onClick={function(){setActiveCategory(cat);}} style={{padding:"4px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:activeCategory===cat?"#1e6eb5":"#fff",color:activeCategory===cat?"#fff":"#6b7280",border:"1.5px solid "+(activeCategory===cat?"#1e6eb5":"#e5e7eb")}}>{cat}</button>;
+                      })}
                     </div>
-                  </div>
-                  <div style={{display:"flex",gap:6,marginBottom:18,flexWrap:"wrap"}}>
-                    {ALL_CATEGORIES.map(cat => (
-                      <button key={cat} onClick={() => setActiveCategory(cat)} style={{padding:"4px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:activeCategory===cat?"#1e6eb5":"#fff",color:activeCategory===cat?"#fff":"#6b7280",border:"1.5px solid "+(activeCategory===cat?"#1e6eb5":"#e5e7eb")}}>{cat}</button>
-                    ))}
+                    <div style={{display:"flex",gap:4,flexShrink:0,marginLeft:8}}>
+                      <button onClick={function(){setSortBy("default");}} style={{padding:"4px 8px",borderRadius:6,fontSize:11,cursor:"pointer",background:sortBy==="default"?"#1e6eb5":"#fff",color:sortBy==="default"?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==="default"?"#1e6eb5":"#e5e7eb")}}>Default</button>
+                      <button onClick={function(){setSortBy("deadline");}} style={{padding:"4px 8px",borderRadius:6,fontSize:11,cursor:"pointer",background:sortBy==="deadline"?"#1e6eb5":"#fff",color:sortBy==="deadline"?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==="deadline"?"#1e6eb5":"#e5e7eb")}}>Deadline</button>
+                    </div>
                   </div>
 
                   {loading ? <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>Loading...</div> : (
                     <div>
-                      {activeTasks.length === 0 && doneTasks.length === 0 && quickFilter !== 'done' && (
-                        <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No tasks here.</div>
-                      )}
-                      {quickFilter === 'done' ? (
+                      {quickFilter==="done" ? (
                         <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                          {allFiltered.filter(t=>t.completed).length === 0
+                          {doneTasks.length===0
                             ? <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No completed tasks yet.</div>
-                            : allFiltered.filter(t=>t.completed).map(task => (
-                              <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
-                            ))
+                            : doneTasks.map(function(task){ return <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />; })
                           }
                         </div>
                       ) : (
-                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                          {activeTasks.map(task => (
-                            <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
-                          ))}
-                        </div>
-                      )}
-
-                      {doneTasks.length > 0 && (
                         <div>
-                          <button onClick={() => setShowDone(!showDone)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,marginTop:20,marginBottom:8}}>
-                            <span style={{fontSize:12,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1px"}}>
-                              {showDone ? "▼" : "▶"} Completed ({doneTasks.length})
-                            </span>
-                          </button>
-                          {showDone && (
-                            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                              {doneTasks.map(task => (
-                                <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
-                              ))}
+                          {activeTasks.length===0 && <div style={{textAlign:"center",padding:40,color:"#9ca3af"}}>No tasks here.</div>}
+                          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                            {activeTasks.map(function(task){ return <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />; })}
+                          </div>
+                          {doneTasks.length > 0 && (
+                            <div style={{marginTop:20}}>
+                              <button onClick={function(){setShowDone(!showDone);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>
+                                {showDone?"▼":"▶"} Completed ({doneTasks.length})
+                              </button>
+                              {showDone && (
+                                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                                  {doneTasks.map(function(task){ return <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />; })}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -606,63 +580,69 @@
                 </div>
               )}
 
-              {activeTab === "timeline" && <Timeline />}
+              {activeTab==="timeline" && <Timeline />}
 
-              {activeTab === "housing" && (
+              {activeTab==="housing" && (
                 <div>
                   <div style={{marginBottom:20}}>
                     <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",marginBottom:4}}>Housing Platforms</div>
                     <div style={{fontSize:13,color:"#6b7280"}}>Register on all 5. More registrations = better chances.</div>
                   </div>
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                    {HOUSING_AGENCIES.map(agency => (
-                      <a key={agency.name} href={agency.url} target="_blank" rel="noopener noreferrer">
-                        <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"15px 18px",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 3px rgba(0,0,0,0.04)",borderLeft:"4px solid "+agency.color}}>
-                          <div style={{flex:1}}>
-                            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
-                              <span style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>{agency.name}</span>
-                              <span style={{fontSize:10,fontWeight:600,color:agency.color,padding:"2px 7px",borderRadius:10,border:"1px solid "+agency.color}}>{agency.badge}</span>
+                    {HOUSING_AGENCIES.map(function(agency){
+                      return (
+                        <a key={agency.name} href={agency.url} target="_blank" rel="noopener noreferrer">
+                          <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"15px 18px",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 3px rgba(0,0,0,0.04)",borderLeft:"4px solid "+agency.color}}>
+                            <div style={{flex:1}}>
+                              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+                                <span style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>{agency.name}</span>
+                                <span style={{fontSize:10,fontWeight:600,color:agency.color,padding:"2px 7px",borderRadius:10,border:"1px solid "+agency.color}}>{agency.badge}</span>
+                              </div>
+                              <div style={{fontSize:12,color:"#6b7280"}}>{agency.desc}</div>
                             </div>
-                            <div style={{fontSize:12,color:"#6b7280"}}>{agency.desc}</div>
+                            <div style={{color:"#9ca3af",fontSize:16}}>-&gt;</div>
                           </div>
-                          <div style={{color:"#9ca3af",fontSize:16}}>→</div>
-                        </div>
-                      </a>
-                    ))}
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {activeTab === "budget" && (
+              {activeTab==="budget" && (
                 <div>
                   <div style={{marginBottom:24}}>
                     <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",marginBottom:4}}>One-Off Setup Costs</div>
-                    <div style={{fontSize:13,color:"#6b7280",marginBottom:14}}>Total estimate: 7,000–10,000 EUR</div>
+                    <div style={{fontSize:13,color:"#6b7280",marginBottom:14}}>Total estimate: 7,000-10,000 EUR</div>
                     <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,overflow:"hidden"}}>
-                      {ONE_OFF.map((row,i) => (
-                        <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:i<ONE_OFF.length-1?"1px solid #f0ede8":"none",background:i%2===0?"#fff":"#faf9f7"}}>
-                          <span style={{fontSize:13,color:"#374151"}}>{row.item}</span>
-                          <div style={{display:"flex",gap:14,alignItems:"center"}}>
-                            <span style={{fontSize:12,color:"#9ca3af"}}>{row.who}</span>
-                            <span style={{fontSize:13,fontWeight:600,color:"#1a1a1a",minWidth:80,textAlign:"right"}}>{row.eur}</span>
+                      {ONE_OFF.map(function(row,i){
+                        return (
+                          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:i<ONE_OFF.length-1?"1px solid #f0ede8":"none",background:i%2===0?"#fff":"#faf9f7"}}>
+                            <span style={{fontSize:13,color:"#374151"}}>{row.item}</span>
+                            <div style={{display:"flex",gap:14,alignItems:"center"}}>
+                              <span style={{fontSize:12,color:"#9ca3af"}}>{row.who}</span>
+                              <span style={{fontSize:13,fontWeight:600,color:"#1a1a1a",minWidth:80,textAlign:"right"}}>{row.eur}</span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                   <div>
                     <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",marginBottom:4}}>Monthly Running Costs</div>
-                    <div style={{fontSize:13,color:"#6b7280",marginBottom:14}}>1,425–1,820 EUR/month</div>
+                    <div style={{fontSize:13,color:"#6b7280",marginBottom:14}}>1,425-1,820 EUR/month</div>
                     <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,overflow:"hidden"}}>
-                      {MONTHLY.map((row,i) => (
-                        <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:i<MONTHLY.length-1?"1px solid #f0ede8":"none",background:i%2===0?"#fff":"#faf9f7"}}>
-                          <span style={{fontSize:13,color:"#374151"}}>{row.item}</span>
-                          <span style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>{row.eur}</span>
-                        </div>
-                      ))}
+                      {MONTHLY.map(function(row,i){
+                        return (
+                          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:i<MONTHLY.length-1?"1px solid #f0ede8":"none",background:i%2===0?"#fff":"#faf9f7"}}>
+                            <span style={{fontSize:13,color:"#374151"}}>{row.item}</span>
+                            <span style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>{row.eur}</span>
+                          </div>
+                        );
+                      })}
                       <div style={{display:"flex",justifyContent:"space-between",padding:"12px 16px",background:"#eff6ff",borderTop:"2px solid #bfdbfe"}}>
                         <span style={{fontSize:13,fontWeight:700,color:"#1e40af"}}>Monthly Total</span>
-                        <span style={{fontSize:13,fontWeight:700,color:"#1e40af"}}>1,425–1,820 EUR</span>
+                        <span style={{fontSize:13,fontWeight:700,color:"#1e40af"}}>1,425-1,820 EUR</span>
                       </div>
                     </div>
                   </div>
@@ -670,25 +650,21 @@
               )}
             </div>
 
-            {activeTab === "tasks" && (
-              <button className="add-fab" onClick={() => setShowAdd(true)}>
+            {activeTab==="tasks" && (
+              <button className="add-fab" onClick={function(){setShowAdd(true);}}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
                 </svg>
               </button>
             )}
 
-            {showAdd && (
-              <TaskModal onClose={() => setShowAdd(false)} onSave={saveTask} onDelete={deleteTask} />
-            )}
-            {editingTask && (
-              <TaskModal task={editingTask} onClose={() => setEditingTask(null)} onSave={saveTask} onDelete={deleteTask} />
-            )}
+            {showAdd && <TaskModal onClose={function(){setShowAdd(false);}} onSave={saveTask} onDelete={deleteTask} />}
+            {editingTask && <TaskModal task={editingTask} onClose={function(){setEditingTask(null);}} onSave={saveTask} onDelete={deleteTask} />}
           </div>
         );
       }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
     </script>
   </body>
 </html>
