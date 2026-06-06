@@ -226,6 +226,8 @@
       function NotesThread({task, onAddNote}) {
         const [noteText, setNoteText] = useState("");
         const [adding, setAdding] = useState(false);
+        const [editingIndex, setEditingIndex] = useState(null);
+        const [editText, setEditText] = useState("");
         let notes = [];
         try { notes = JSON.parse(task.notes_thread || "[]"); } catch(e) {}
 
@@ -239,12 +241,44 @@
           setAdding(false);
         }
 
+        async function handleDelete(index) {
+          const updated = notes.filter((_, i) => i !== index);
+          await onAddNote(task.id, JSON.stringify(updated));
+        }
+
+        async function handleEdit(index) {
+          if (!editText.trim()) return;
+          const updated = notes.map((n, i) => i === index ? {...n, text: editText.trim(), edited: true} : n);
+          await onAddNote(task.id, JSON.stringify(updated));
+          setEditingIndex(null);
+          setEditText("");
+        }
+
         return (
           <div style={{marginTop:8}} onClick={e => e.stopPropagation()}>
-            {notes.map((n,i) => (
-              <div key={i} className="note-bubble">
-                <div style={{fontSize:11,color:"#9ca3af",marginBottom:2}}>{n.author} · {n.time}</div>
-                <div>{n.text}</div>
+            {notes.map((n, i) => (
+              <div key={i} className="note-bubble" style={{marginBottom:6}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                  <span style={{fontSize:11,color:"#9ca3af"}}>{n.author} · {n.time}{n.edited ? " (edited)" : ""}</span>
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={() => { setEditingIndex(i); setEditText(n.text); }}
+                      style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#9ca3af",padding:0}}>✏️</button>
+                    <button onClick={() => handleDelete(i)}
+                      style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#fca5a5",padding:0}}>✕</button>
+                  </div>
+                </div>
+                {editingIndex === i ? (
+                  <div style={{display:"flex",gap:6,marginTop:4}}>
+                    <input className="note-input" value={editText} onChange={e => setEditText(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && handleEdit(i)}
+                      style={{flex:1}} autoFocus />
+                    <button className="note-send-btn" onClick={() => handleEdit(i)}>Save</button>
+                    <button onClick={() => setEditingIndex(null)}
+                      style={{padding:"8px 10px",background:"none",border:"1.5px solid #e5e7eb",borderRadius:8,cursor:"pointer",fontSize:12,color:"#6b7280"}}>✕</button>
+                  </div>
+                ) : (
+                  <div style={{fontSize:13,color:"#374151"}}>{n.text}</div>
+                )}
               </div>
             ))}
             <div className="note-input-row">
