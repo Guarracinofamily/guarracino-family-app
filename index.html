@@ -464,6 +464,226 @@
         );
       }
 
+
+      var APPT_STATUSES = [
+        {key:"considering", label:"Considering", color:"#6b7280", bg:"#f3f4f6"},
+        {key:"viewing",     label:"Viewing",     color:"#d97706", bg:"#fef3c7"},
+        {key:"applied",     label:"Applied",     color:"#1e6eb5", bg:"#dbeafe"},
+        {key:"offer",       label:"Offer Made",  color:"#7c3aed", bg:"#ede9fe"},
+        {key:"accepted",    label:"Accepted",    color:"#166534", bg:"#dcfce7"},
+        {key:"rejected",    label:"Rejected",    color:"#dc2626", bg:"#fee2e2"},
+      ];
+
+      function statusInfo(key) {
+        return APPT_STATUSES.find(function(s){return s.key===key;}) || APPT_STATUSES[0];
+      }
+
+      function ApartmentModal(props) {
+        var apt = props.apt;
+        var onClose = props.onClose;
+        var onSave = props.onSave;
+        var onDelete = props.onDelete;
+        var isEdit = !!apt;
+        var [name, setName] = useState(apt ? apt.name : "");
+        var [address, setAddress] = useState(apt ? apt.address : "");
+        var [price, setPrice] = useState(apt ? apt.price : "");
+        var [landlord, setLandlord] = useState(apt ? apt.landlord : "");
+        var [phone, setPhone] = useState(apt ? apt.phone : "");
+        var [link, setLink] = useState(apt ? apt.link : "");
+        var [status, setStatus] = useState(apt ? apt.status : "considering");
+        var [pros, setPros] = useState(apt ? apt.pros : "");
+        var [cons, setCons] = useState(apt ? apt.cons : "");
+        var [notes, setNotes] = useState(apt ? apt.notes : "");
+        var [confirm, setConfirm] = useState(false);
+
+        function handleSave() {
+          if (!name.trim()) return;
+          onSave({id:apt?apt.id:null, name:name.trim(), address, price, landlord, phone, link, status, pros, cons, notes});
+          onClose();
+        }
+
+        return (
+          <div className="modal-overlay" onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
+            <div className="modal-box">
+              <div className="modal-title">{isEdit ? "Edit apartment" : "Add apartment"}</div>
+              <div className="form-field">
+                <label className="form-label">Name / Reference</label>
+                <input className="form-input" placeholder="e.g. Studio De Pijp, Frederiksstraat" value={name} onChange={function(e){setName(e.target.value);}} autoFocus />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Status</label>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  {APPT_STATUSES.map(function(s){
+                    return (
+                      <button key={s.key} onClick={function(){setStatus(s.key);}} style={{padding:"5px 12px",borderRadius:20,fontSize:12,fontWeight:500,cursor:"pointer",background:status===s.key?s.color:s.bg,color:status===s.key?"#fff":s.color,border:"1.5px solid "+s.color}}>
+                        {s.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{display:"flex",gap:10}}>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Price / month</label>
+                  <input className="form-input" placeholder="e.g. 900 EUR" value={price} onChange={function(e){setPrice(e.target.value);}} />
+                </div>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Address</label>
+                  <input className="form-input" placeholder="Street, Amsterdam" value={address} onChange={function(e){setAddress(e.target.value);}} />
+                </div>
+              </div>
+              <div style={{display:"flex",gap:10}}>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Landlord name</label>
+                  <input className="form-input" placeholder="Name" value={landlord} onChange={function(e){setLandlord(e.target.value);}} />
+                </div>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Phone / WhatsApp</label>
+                  <input className="form-input" placeholder="+31..." value={phone} onChange={function(e){setPhone(e.target.value);}} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Listing URL</label>
+                <input className="form-input" placeholder="https://housinganywhere.com/..." value={link} onChange={function(e){setLink(e.target.value);}} />
+              </div>
+              <div style={{display:"flex",gap:10}}>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Pros</label>
+                  <input className="form-input" placeholder="Good location, modern..." value={pros} onChange={function(e){setPros(e.target.value);}} />
+                </div>
+                <div className="form-field" style={{flex:1}}>
+                  <label className="form-label">Cons</label>
+                  <input className="form-input" placeholder="Expensive, small..." value={cons} onChange={function(e){setCons(e.target.value);}} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Notes</label>
+                <input className="form-input" placeholder="Any other details..." value={notes} onChange={function(e){setNotes(e.target.value);}} />
+              </div>
+              <button className="btn-primary" onClick={handleSave}>{isEdit ? "Save changes" : "Add apartment"}</button>
+              {isEdit && !confirm && <button className="btn-danger" onClick={function(){setConfirm(true);}}>Remove apartment</button>}
+              {isEdit && confirm && (
+                <div style={{background:"#fef2f2",border:"1.5px solid #fecaca",borderRadius:12,padding:"14px 16px",marginTop:8}}>
+                  <div style={{fontSize:13,fontWeight:600,color:"#dc2626",marginBottom:10}}>Remove this apartment?</div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={function(){onDelete(apt.id);onClose();}} style={{flex:1,padding:"10px",background:"#dc2626",color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer"}}>Yes, remove</button>
+                    <button onClick={function(){setConfirm(false);}} style={{flex:1,padding:"10px",background:"#fff",color:"#374151",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:13,cursor:"pointer"}}>Cancel</button>
+                  </div>
+                </div>
+              )}
+              <button className="btn-cancel" onClick={onClose}>Cancel</button>
+            </div>
+          </div>
+        );
+      }
+
+      function ApartmentTracker() {
+        var [apts, setApts] = useState([]);
+        var [loading, setLoading] = useState(true);
+        var [showModal, setShowModal] = useState(false);
+        var [editing, setEditing] = useState(null);
+        var [filterStatus, setFilterStatus] = useState("all");
+
+        useEffect(function(){
+          supabase.from("housing_listings").select("*").order("created_at").then(function(r){
+            setApts(r.data || []);
+            setLoading(false);
+          });
+        }, []);
+
+        function saveApt(data) {
+          if (data.id) {
+            supabase.from("housing_listings").update(data).eq("id",data.id).then(function(){
+              setApts(function(prev){return prev.map(function(a){return a.id===data.id?Object.assign({},a,data):a;});});
+            });
+          } else {
+            supabase.from("housing_listings").insert([data]).select().then(function(r){
+              if(r.data) setApts(function(prev){return prev.concat(r.data);});
+            });
+          }
+        }
+
+        function deleteApt(id) {
+          supabase.from("housing_listings").delete().eq("id",id).then(function(){
+            setApts(function(prev){return prev.filter(function(a){return a.id!==id;});});
+          });
+        }
+
+        var filtered = filterStatus==="all" ? apts : apts.filter(function(a){return a.status===filterStatus;});
+
+        return (
+          <div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <div>
+                <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a"}}>Apartment Search</div>
+                <div style={{fontSize:12,color:"#9ca3af",marginTop:2}}>{apts.length} tracked · tap card to edit</div>
+              </div>
+              <button onClick={function(){setEditing(null);setShowModal(true);}} style={{padding:"8px 16px",background:"#1e6eb5",color:"#fff",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer"}}>+ Add</button>
+            </div>
+
+            <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
+              <button onClick={function(){setFilterStatus("all");}} style={{padding:"4px 10px",borderRadius:20,fontSize:11,fontWeight:500,cursor:"pointer",background:filterStatus==="all"?"#1a1a1a":"#fff",color:filterStatus==="all"?"#fff":"#6b7280",border:"1.5px solid "+(filterStatus==="all"?"#1a1a1a":"#e5e7eb")}}>All ({apts.length})</button>
+              {APPT_STATUSES.map(function(s){
+                var count = apts.filter(function(a){return a.status===s.key;}).length;
+                if (count === 0) return null;
+                return (
+                  <button key={s.key} onClick={function(){setFilterStatus(s.key);}} style={{padding:"4px 10px",borderRadius:20,fontSize:11,fontWeight:500,cursor:"pointer",background:filterStatus===s.key?s.color:s.bg,color:filterStatus===s.key?"#fff":s.color,border:"1.5px solid "+s.color}}>
+                    {s.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+
+            {loading && <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>Loading...</div>}
+
+            {!loading && filtered.length === 0 && (
+              <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>
+                <div style={{fontSize:32,marginBottom:12}}>🏠</div>
+                <div style={{fontSize:14,fontWeight:500,marginBottom:6}}>No apartments yet</div>
+                <div style={{fontSize:13}}>Tap + Add to log the first one</div>
+              </div>
+            )}
+
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {filtered.map(function(apt){
+                var s = statusInfo(apt.status);
+                return (
+                  <div key={apt.id} onClick={function(){setEditing(apt);setShowModal(true);}} style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"14px 16px",cursor:"pointer",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",borderLeft:"4px solid "+s.color}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                      <div style={{fontSize:15,fontWeight:600,color:"#1a1a1a",flex:1}}>{apt.name}</div>
+                      <span style={{fontSize:11,fontWeight:600,background:s.bg,color:s.color,padding:"3px 10px",borderRadius:20,flexShrink:0,marginLeft:8}}>{s.label}</span>
+                    </div>
+                    <div style={{display:"flex",gap:16,flexWrap:"wrap",marginBottom:apt.pros||apt.cons||apt.notes?8:0}}>
+                      {apt.price && <span style={{fontSize:12,color:"#1e6eb5",fontWeight:600}}>{apt.price}/mo</span>}
+                      {apt.address && <span style={{fontSize:12,color:"#6b7280"}}>{apt.address}</span>}
+                      {apt.landlord && <span style={{fontSize:12,color:"#6b7280"}}>Landlord: {apt.landlord}</span>}
+                      {apt.phone && <span style={{fontSize:12,color:"#6b7280"}}>{apt.phone}</span>}
+                    </div>
+                    {(apt.pros || apt.cons) && (
+                      <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+                        {apt.pros && <span style={{fontSize:11,color:"#166534",background:"#f0fdf4",padding:"2px 8px",borderRadius:6}}>+ {apt.pros}</span>}
+                        {apt.cons && <span style={{fontSize:11,color:"#dc2626",background:"#fef2f2",padding:"2px 8px",borderRadius:6}}>- {apt.cons}</span>}
+                      </div>
+                    )}
+                    {apt.notes && <div style={{fontSize:11,color:"#6b7280",marginTop:6,fontStyle:"italic"}}>{apt.notes}</div>}
+                    {apt.link && <div style={{fontSize:11,color:"#1e6eb5",marginTop:6}}>View listing →</div>}
+                  </div>
+                );
+              })}
+            </div>
+
+            {showModal && (
+              <ApartmentModal
+                apt={editing}
+                onClose={function(){setShowModal(false);setEditing(null);}}
+                onSave={saveApt}
+                onDelete={deleteApt}
+              />
+            )}
+          </div>
+        );
+      }
+
       var ONEOFF_SEED = [
         {item:"Flight Sicily to Amsterdam",eur:"150-250",who:"Francesco"},
         {item:"VU tuition fee year 1",eur:"2,700",who:"Francesco"},
@@ -758,7 +978,7 @@
                 </div>
 
                 <div style={{display:"flex"}}>
-                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["budget","Budget"]].map(function(item){
+                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["budget","Budget"]].map(function(item){
                     return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280"}}>{item[1]}</button>;
                   })}
                 </div>
@@ -823,6 +1043,7 @@
               )}
 
               {activeTab==="timeline" && <Timeline />}
+              {activeTab==="apartments" && <ApartmentTracker />}
 
               {activeTab==="housing" && (
                 <div>
