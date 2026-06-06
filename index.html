@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Guarracino Family</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -15,7 +15,9 @@
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+      html { overflow-x: hidden; }
       button { font-family: inherit; } a { text-decoration: none; }
+      .tab-bar::-webkit-scrollbar { display: none; }
       input, textarea, select { font-family: inherit; }
       .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; justify-content: center; z-index: 100; }
       .modal-box { background: #fff; border-radius: 20px 20px 0 0; padding: 28px 24px 40px; width: 100%; max-width: 600px; animation: slideup 0.25s ease; max-height: 90vh; overflow-y: auto; }
@@ -1246,9 +1248,9 @@
                   </button>
                 </div>
 
-                <div style={{display:"flex"}}>
+                <div className="tab-bar" style={{display:"flex",overflowX:"auto",scrollbarWidth:"none",msOverflowStyle:"none"}}>
                   {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["spending","Spending"],["budget","Budget"]].map(function(item){
-                    return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280"}}>{item[1]}</button>;
+                    return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280",flexShrink:0,whiteSpace:"nowrap"}}>{item[1]}</button>;
                   })}
                 </div>
               </div>
