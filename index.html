@@ -691,6 +691,7 @@
 
         var activeTasks = allFiltered.filter(function(t){
           if (quickFilter==="urgent") return t.urgent && !t.completed;
+          if (quickFilter==="remaining") return !t.completed;
           return !t.completed;
         });
 
@@ -751,9 +752,9 @@
                   <button onClick={function(){setQuickFilter(quickFilter==="done"?null:"done");setShowDone(true);setActiveTab("tasks");}} style={{background:quickFilter==="done"?"#166534":"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==="done"?"#fff":"#166534",fontWeight:500,cursor:"pointer"}}>
                     {completedCount} done
                   </button>
-                  <span style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#6b7280",fontWeight:500}}>
+                  <button onClick={function(){setQuickFilter(quickFilter==="remaining"?null:"remaining");setActiveTab("tasks");}} style={{background:quickFilter==="remaining"?"#374151":"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==="remaining"?"#fff":"#6b7280",fontWeight:500,cursor:"pointer"}}>
                     {totalCount-completedCount} remaining
-                  </span>
+                  </button>
                 </div>
 
                 <div style={{display:"flex"}}>
