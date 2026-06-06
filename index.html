@@ -466,6 +466,212 @@
 
 
 
+
+      function TodayDashboard(props) {
+        var tasks = props.tasks;
+        var setActiveTab = props.setActiveTab;
+        var setActiveCategory = props.setActiveCategory;
+        var setQuickFilter = props.setQuickFilter;
+
+        var [apts, setApts] = useState([]);
+        var [spending, setSpending] = useState([]);
+        var [monthlyBudget] = useState(function(){ try { return parseFloat(localStorage.getItem("eman_budget")||"1600"); } catch(e){ return 1600; } });
+
+        useEffect(function(){
+          supabase.from("housing_listings").select("*").order("created_at").then(function(r){ setApts(r.data||[]); });
+          var today = new Date();
+          var firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
+          supabase.from("spending").select("*").eq("person","Emanuel").gte("spend_date",firstDay).then(function(r){ setSpending(r.data||[]); });
+        }, []);
+
+        var now = new Date();
+        var greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 18 ? "Good afternoon" : "Good evening";
+        var dateStr = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+
+        // Task analysis
+        var urgentTasks = tasks.filter(function(t){ return t.urgent && !t.completed; });
+        var francescoTasks = tasks.filter(function(t){ return t.owner==="Francesco" && !t.completed; });
+        var emanuelTasks = tasks.filter(function(t){ return t.owner==="Emanuel" && !t.completed; });
+        var completedCount = tasks.filter(function(t){ return t.completed; }).length;
+        var totalCount = tasks.length;
+        var progress = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
+
+        // Spending this month
+        var monthSpend = spending.reduce(function(sum,e){ return sum+parseFloat(e.amount); },0);
+        var budgetPct = monthlyBudget > 0 ? Math.min((monthSpend/monthlyBudget)*100, 100) : 0;
+        var budgetColor = budgetPct > 100 ? "#dc2626" : budgetPct > 80 ? "#f59e0b" : "#1e6eb5";
+
+        // Apartments by status
+        var activeApts = apts.filter(function(a){ return a.status!=="rejected"; });
+        var hotApts = apts.filter(function(a){ return a.status==="viewing"||a.status==="applied"||a.status==="offer"; });
+
+        // Days to IB results
+        var ibDate = new Date("2026-07-05");
+        var daysToIB = Math.ceil((ibDate - now) / 86400000);
+
+        return (
+          <div>
+            {/* Greeting */}
+            <div style={{marginBottom:20}}>
+              <div style={{fontSize:22,fontWeight:700,color:"#1a1a1a"}}>{greeting}, Francesco</div>
+              <div style={{fontSize:13,color:"#9ca3af",marginTop:2}}>{dateStr}</div>
+            </div>
+
+            {/* IB countdown - always visible until July 5 */}
+            {daysToIB > 0 && (
+              <div style={{background:"linear-gradient(135deg,#1e6eb5,#1e40af)",borderRadius:14,padding:"16px 20px",marginBottom:16,color:"#fff"}}>
+                <div style={{fontSize:11,fontWeight:600,letterSpacing:"1px",opacity:0.8,marginBottom:4}}>COUNTDOWN</div>
+                <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+                  <div style={{fontSize:36,fontWeight:700}}>{daysToIB}</div>
+                  <div style={{fontSize:16,opacity:0.9}}>days to IB results</div>
+                </div>
+                <div style={{fontSize:12,opacity:0.7,marginTop:4}}>5 July 2026 · Emanuel's results released</div>
+              </div>
+            )}
+            {daysToIB <= 0 && (
+              <div style={{background:"linear-gradient(135deg,#166534,#15803d)",borderRadius:14,padding:"16px 20px",marginBottom:16,color:"#fff"}}>
+                <div style={{fontSize:16,fontWeight:700}}>IB Results Day</div>
+                <div style={{fontSize:13,opacity:0.8,marginTop:4}}>Check results and email VU today</div>
+              </div>
+            )}
+
+            {/* Progress summary */}
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Overall Progress</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#1e6eb5"}}>{progress}%</div>
+              </div>
+              <div style={{height:10,background:"#e5e7eb",borderRadius:5,overflow:"hidden",marginBottom:10}}>
+                <div style={{height:"100%",width:progress+"%",background:"linear-gradient(90deg,#60a5fa,#1e6eb5)",borderRadius:5,transition:"width 0.6s"}} />
+              </div>
+              <div style={{display:"flex",gap:16}}>
+                <div style={{flex:1,textAlign:"center",padding:"8px",background:"#fef3c7",borderRadius:8}}>
+                  <div style={{fontSize:18,fontWeight:700,color:"#92400e"}}>{urgentTasks.length}</div>
+                  <div style={{fontSize:11,color:"#92400e"}}>Urgent</div>
+                </div>
+                <div style={{flex:1,textAlign:"center",padding:"8px",background:"#dbeafe",borderRadius:8}}>
+                  <div style={{fontSize:18,fontWeight:700,color:"#1565c0"}}>{emanuelTasks.length}</div>
+                  <div style={{fontSize:11,color:"#1565c0"}}>Emanuel's tasks</div>
+                </div>
+                <div style={{flex:1,textAlign:"center",padding:"8px",background:"#e8f5e9",borderRadius:8}}>
+                  <div style={{fontSize:18,fontWeight:700,color:"#2d5a3d"}}>{francescoTasks.length}</div>
+                  <div style={{fontSize:11,color:"#2d5a3d"}}>Francesco's tasks</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Urgent tasks */}
+            {urgentTasks.length > 0 && (
+              <div style={{background:"#fff",border:"1px solid #fcd34d",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <div style={{fontSize:14,fontWeight:600,color:"#92400e"}}>{urgentTasks.length} Urgent Tasks</div>
+                  <button onClick={function(){setQuickFilter("urgent");setActiveTab("tasks");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>See all →</button>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {urgentTasks.slice(0,3).map(function(task){
+                    var c = OWNER_COLORS[task.owner]||OWNER_COLORS.All;
+                    return (
+                      <div key={task.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:"#fefce8",borderRadius:8,border:"1px solid #fef08a"}}>
+                        <div style={{width:8,height:8,borderRadius:4,background:"#f59e0b",flexShrink:0}} />
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:13,fontWeight:500,color:"#1a1a1a"}}>{task.task_text}</div>
+                          <div style={{fontSize:11,color:"#9ca3af"}}>{task.owner} · {task.due_date}</div>
+                        </div>
+                        <span style={{fontSize:10,background:c.bg,color:c.text,padding:"2px 7px",borderRadius:8,fontWeight:500}}>{task.owner}</span>
+                      </div>
+                    );
+                  })}
+                  {urgentTasks.length > 3 && <div style={{fontSize:12,color:"#9ca3af",textAlign:"center"}}>+{urgentTasks.length-3} more urgent tasks</div>}
+                </div>
+              </div>
+            )}
+
+            {/* Spending this month */}
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Emanuel's Spending</div>
+                <button onClick={function(){setActiveTab("spending");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>Details →</button>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}}>
+                <div style={{fontSize:24,fontWeight:700,color:"#1a1a1a"}}>EUR {monthSpend.toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+                <div style={{fontSize:13,color:"#9ca3af"}}>of EUR {monthlyBudget.toLocaleString()} budget</div>
+              </div>
+              <div style={{height:8,background:"#e5e7eb",borderRadius:4,overflow:"hidden",marginBottom:6}}>
+                <div style={{height:"100%",width:budgetPct+"%",background:budgetColor,borderRadius:4,transition:"width 0.4s"}} />
+              </div>
+              <div style={{fontSize:12,fontWeight:600,color:budgetColor}}>
+                {monthSpend > monthlyBudget ? "EUR "+(monthSpend-monthlyBudget).toFixed(2)+" over budget this month" : "EUR "+(monthlyBudget-monthSpend).toFixed(2)+" remaining this month"}
+              </div>
+            </div>
+
+            {/* Apartment search status */}
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Apartment Search</div>
+                <button onClick={function(){setActiveTab("apartments");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>See all →</button>
+              </div>
+              {apts.length === 0 ? (
+                <div style={{fontSize:13,color:"#9ca3af",textAlign:"center",padding:"12px 0"}}>No apartments tracked yet</div>
+              ) : (
+                <div>
+                  <div style={{display:"flex",gap:10,marginBottom:10}}>
+                    <div style={{flex:1,textAlign:"center",padding:"8px",background:"#f3f4f6",borderRadius:8}}>
+                      <div style={{fontSize:18,fontWeight:700,color:"#374151"}}>{apts.length}</div>
+                      <div style={{fontSize:11,color:"#6b7280"}}>Tracked</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"8px",background:"#fef3c7",borderRadius:8}}>
+                      <div style={{fontSize:18,fontWeight:700,color:"#92400e"}}>{hotApts.length}</div>
+                      <div style={{fontSize:11,color:"#92400e"}}>Active</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"8px",background:"#dcfce7",borderRadius:8}}>
+                      <div style={{fontSize:18,fontWeight:700,color:"#166534"}}>{apts.filter(function(a){return a.status==="accepted";}).length}</div>
+                      <div style={{fontSize:11,color:"#166534"}}>Accepted</div>
+                    </div>
+                  </div>
+                  {hotApts.slice(0,2).map(function(apt){
+                    var s = statusInfo(apt.status);
+                    return (
+                      <div key={apt.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:"#f8fafc",borderRadius:8,marginBottom:6,border:"1px solid #e5e3df"}}>
+                        <div style={{width:8,height:8,borderRadius:4,background:s.color,flexShrink:0}} />
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:13,fontWeight:500,color:"#1a1a1a"}}>{apt.name}</div>
+                          <div style={{fontSize:11,color:"#9ca3af"}}>{apt.price || "No price"} · {s.label}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Francesco's action items */}
+            {francescoTasks.length > 0 && (
+              <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <div style={{fontSize:14,fontWeight:600,color:"#2d5a3d"}}>Francesco — Your Tasks</div>
+                  <button onClick={function(){setActiveOwner&&null;setActiveTab("tasks");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>See all →</button>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {francescoTasks.slice(0,4).map(function(task){
+                    return (
+                      <div key={task.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:"#f0fdf4",borderRadius:8}}>
+                        <div style={{width:8,height:8,borderRadius:4,background:"#2d5a3d",flexShrink:0}} />
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:13,color:"#1a1a1a"}}>{task.task_text}</div>
+                          {task.due_date && <div style={{fontSize:11,color:"#9ca3af"}}>{task.due_date}</div>}
+                        </div>
+                        {task.urgent && <span style={{fontSize:10,background:"#fef3c7",color:"#92400e",padding:"2px 7px",borderRadius:8,fontWeight:600}}>URGENT</span>}
+                      </div>
+                    );
+                  })}
+                  {francescoTasks.length > 4 && <div style={{fontSize:12,color:"#9ca3af",textAlign:"center"}}>+{francescoTasks.length-4} more tasks</div>}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
       var SPEND_CATEGORIES = ["Rent","Grocery","Restaurant","Transport","Telephone","Health Insurance","University","Social","Clothing","Travel","Other"];
       var SPEND_COLORS = {"Rent":"#1e6eb5","Grocery":"#2d5a3d","Restaurant":"#d97706","Transport":"#7c3aed","Telephone":"#b45309","Health Insurance":"#be185d","University":"#0891b2","Social":"#f59e0b","Clothing":"#6b7280","Travel":"#0d9488","Other":"#9ca3af"};
 
@@ -1105,7 +1311,7 @@
       function App() {
         var [tasks, setTasks] = useState([]);
         var [loading, setLoading] = useState(true);
-        var [activeTab, setActiveTab] = useState("tasks");
+        var [activeTab, setActiveTab] = useState("today");
         var [activeCategory, setActiveCategory] = useState("All Tasks");
         var [activeOwner, setActiveOwner] = useState("All");
         var [editingTask, setEditingTask] = useState(null);
@@ -1247,7 +1453,7 @@
                 </div>
 
                 <div style={{display:"flex"}}>
-                  {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["spending","Spending"],["budget","Budget"]].map(function(item){
+                  {[["today","Today"],["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["apartments","Apartments"],["spending","Spending"],["budget","Budget"]].map(function(item){
                     return <button key={item[0]} onClick={function(){setActiveTab(item[0]);}} style={{padding:"9px 14px",fontSize:13,fontWeight:500,background:"none",border:"none",cursor:"pointer",borderBottom:activeTab===item[0]?"2px solid #1e6eb5":"2px solid transparent",color:activeTab===item[0]?"#1e6eb5":"#6b7280"}}>{item[1]}</button>;
                   })}
                 </div>
@@ -1311,6 +1517,7 @@
                 </div>
               )}
 
+              {activeTab==="today" && <TodayDashboard tasks={tasks} setActiveTab={setActiveTab} setActiveCategory={setActiveCategory} setQuickFilter={setQuickFilter} />}
               {activeTab==="timeline" && <Timeline />}
               {activeTab==="apartments" && <ApartmentTracker />}
               {activeTab==="spending" && <SpendingTracker />}
