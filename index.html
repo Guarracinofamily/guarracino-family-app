@@ -524,7 +524,7 @@
 
             {/* IB countdown - always visible until July 5 */}
             {daysToIB > 0 && (
-              <div style={{background:"linear-gradient(135deg,#1e6eb5,#1e40af)",borderRadius:14,padding:"16px 20px",marginBottom:16,color:"#fff"}}>
+              <div style={{background:"linear-gradient(135deg,#1e6eb5,#1e40af)",borderRadius:14,padding:"16px 16px",marginBottom:16,color:"#fff",boxSizing:"border-box",width:"100%"}}>
                 <div style={{fontSize:11,fontWeight:600,letterSpacing:"1px",opacity:0.8,marginBottom:4}}>COUNTDOWN</div>
                 <div style={{display:"flex",alignItems:"baseline",gap:8}}>
                   <div style={{fontSize:36,fontWeight:700}}>{daysToIB}</div>
@@ -541,7 +541,7 @@
             )}
 
             {/* Progress summary */}
-            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 16px",marginBottom:12,boxSizing:"border-box",width:"100%"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Overall Progress</div>
                 <div style={{fontSize:20,fontWeight:700,color:"#1e6eb5"}}>{progress}%</div>
@@ -592,7 +592,7 @@
             )}
 
             {/* Spending this month */}
-            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 16px",marginBottom:12,boxSizing:"border-box",width:"100%"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Emanuel's Spending</div>
                 <button onClick={function(){setActiveTab("spending");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>Details →</button>
@@ -610,7 +610,7 @@
             </div>
 
             {/* Apartment search status */}
-            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 16px",marginBottom:12,boxSizing:"border-box",width:"100%"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>Apartment Search</div>
                 <button onClick={function(){setActiveTab("apartments");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>See all →</button>
@@ -651,7 +651,7 @@
 
             {/* Francesco's action items */}
             {francescoTasks.length > 0 && (
-              <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+              <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:14,padding:"16px 16px",marginBottom:12,boxSizing:"border-box",width:"100%"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
                   <div style={{fontSize:14,fontWeight:600,color:"#2d5a3d"}}>Francesco — Your Tasks</div>
                   <button onClick={function(){setActiveOwner&&null;setActiveTab("tasks");}} style={{fontSize:12,color:"#1e6eb5",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>See all →</button>
@@ -1421,7 +1421,7 @@
             )}
 
             <div style={{background:"#fff",borderBottom:"1px solid #e5e3df",padding:"0 20px",position:"sticky",top:showInstall?46:0,zIndex:10,overflow:"hidden"}}>
-              <div style={{maxWidth:"100%",margin:"0 auto"}}>
+              <div style={{maxWidth:860,margin:"0 auto"}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0 10px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:12}}>
                     <GIcon size={44} />
@@ -1465,7 +1465,7 @@
               </div>
             </div>
 
-            <div style={{maxWidth:"100%",margin:"0 auto",padding:"20px",minHeight:"calc(100vh - 200px)",overflow:"hidden"}}>
+            <div style={{maxWidth:860,margin:"0 auto",padding:"20px",minHeight:"calc(100vh - 200px)",overflow:"hidden"}}>
 
               {activeTab==="tasks" && (
                 <div>
