@@ -3,17 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Guarracino Family App</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <title>Guarracino Family</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Guarracino" />
+    <meta name="theme-color" content="#1e6eb5" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9IiMxZTZlYjUiLz48Y2lyY2xlIGN4PSI1MTIiIGN5PSI0ODAiIHI9IjQyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDRhZjZhIiBzdHJva2Utd2lkdGg9IjgiLz48Y2lyY2xlIGN4PSI1MTIiIGN5PSI0ODAiIHI9IjM4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiIG9wYWNpdHk9IjAuMiIvPjx0ZXh0IHg9IjUxMiIgeT0iNTYwIiBmb250LWZhbWlseT0iRnV0dXJhLCBDZW50dXJ5IEdvdGhpYywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2NDAiIGZvbnQtd2VpZ2h0PSIzMDAiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkc8L3RleHQ+PHJlY3QgeD0iMzIwIiB5PSI3MjAiIHdpZHRoPSIzODQiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWY2YSIvPjx0ZXh0IHg9IjUxMiIgeT0iNzgwIiBmb250LWZhbWlseT0iRnV0dXJhLCBDZW50dXJ5IEdvdGhpYywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9IjQwMCIgZmlsbD0iI2Q0YWY2YSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjI0Ij5GQU1JTFk8L3RleHQ+PC9zdmc+" />
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #faf9f7; font-family: 'DM Sans', sans-serif; }
-      button { font-family: 'DM Sans', sans-serif; }
+      body { background: #faf9f7; font-family: 'DM Sans', system-ui, sans-serif; }
+      button { font-family: inherit; }
       a { text-decoration: none; }
+      input, textarea, select { font-family: inherit; }
+
+      .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        display: flex; align-items: flex-end; justify-content: center;
+        z-index: 100; padding: 0;
+      }
+      .modal-box {
+        background: #fff; border-radius: 20px 20px 0 0;
+        padding: 28px 24px 40px; width: 100%; max-width: 600px;
+        animation: slideup 0.25s ease;
+      }
+      @keyframes slideup {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .modal-title { font-size: 17px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px; }
+      .form-field { margin-bottom: 14px; }
+      .form-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+      .form-input {
+        width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb;
+        border-radius: 10px; font-size: 14px; color: #1a1a1a;
+        outline: none; transition: border 0.15s;
+      }
+      .form-input:focus { border-color: #1e6eb5; }
+      .form-select {
+        width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb;
+        border-radius: 10px; font-size: 14px; color: #1a1a1a;
+        outline: none; background: #fff; appearance: none;
+      }
+      .btn-primary {
+        width: 100%; padding: 14px; background: #1e6eb5; color: #fff;
+        border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+        cursor: pointer; margin-top: 8px;
+      }
+      .btn-cancel {
+        width: 100%; padding: 12px; background: none; color: #6b7280;
+        border: none; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 4px;
+      }
+      .add-fab {
+        position: fixed; bottom: 28px; right: 24px;
+        width: 56px; height: 56px; border-radius: 28px;
+        background: #1e6eb5; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 16px rgba(30,110,181,0.4);
+        z-index: 50; transition: transform 0.15s;
+      }
+      .add-fab:active { transform: scale(0.94); }
+      .install-banner {
+        background: #1e6eb5; color: #fff;
+        padding: 12px 20px; display: flex; align-items: center;
+        justify-content: space-between; gap: 12px;
+      }
     </style>
   </head>
   <body>
@@ -25,51 +82,52 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1c2lpZXR5enRiYmFqeHNiaW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDMzMTQsImV4cCI6MjA5NjI3OTMxNH0.DT149hK2viY9f9RStyiBWrUBAEgnfczPVBz4HnToThQ"
       );
 
-      const INITIAL_TASKS = [
-        { task_text: "Check IB results on candidate portal", category: "University & Enrollment", owner: "Emanuel", due_date: "5 Jul 2026", urgent: true, note: "Do first thing that morning" },
-        { task_text: "Email VU International Student Advisor with transcript", category: "University & Enrollment", owner: "Emanuel", due_date: "5 Jul 2026", urgent: true, note: "Attach digital transcript from IB portal same day" },
-        { task_text: "Pay tuition fee via Studielink", category: "University & Enrollment", owner: "Francesco", due_date: "Week of 7 Jul 2026", urgent: false, note: "€2,700 EU rate — needs SEPA or international transfer" },
-        { task_text: "Send certified copy of IB diploma to VU by post", category: "University & Enrollment", owner: "Emanuel", due_date: "Before 1 Aug 2026", urgent: false, note: "Post to: De Boelelaan 1105, 1081 HV Amsterdam. School certifies it." },
-        { task_text: "Confirm full enrolment status on Studielink", category: "University & Enrollment", owner: "Emanuel", due_date: "Before 31 Aug 2026", urgent: false, note: "Status must show enrolled — hard deadline" },
-        { task_text: "Register for VU introduction week", category: "University & Enrollment", owner: "Emanuel", due_date: "July 2026", urgent: false, note: "Important for settling in socially" },
-        { task_text: "Register on HousingAnywhere via VU priority link", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: true, note: "Email vip@housinganywhere.com — 20% discount + priority Amsterdam listings. Cost €26-55" },
-        { task_text: "Register on Room.nl (DUWO student housing)", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: true, note: "Queue-based allocation — every week counts. Free." },
-        { task_text: "Register on Spotahome", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: false, note: "Verified listings with video tours — good for booking remotely" },
-        { task_text: "Register on Kamernet", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: false, note: "Largest NL platform. Set alerts for 700-1,000 Amsterdam" },
-        { task_text: "Check VU accommodation queue status on VU dashboard", category: "Housing", owner: "Emanuel", due_date: "Weekly check", urgent: false, note: "VU housing first-paid-first-served" },
-        { task_text: "Sign rental contract", category: "Housing", owner: "Emanuel", due_date: "As soon as found", urgent: false, note: "Confirm registration possible for BSN before signing" },
-        { task_text: "Pay first month + deposit", category: "Housing", owner: "Francesco", due_date: "On contract signing", urgent: false, note: "Target under 1,000/month. Budget 1-2 months deposit" },
-        { task_text: "Initiate apostille process for Italian documents", category: "Documents & Admin", owner: "Francesco", due_date: "Immediately", urgent: true, note: "Long lead time — start now. Birth certificate minimum" },
-        { task_text: "Check Emanuel passport expiry", category: "Documents & Admin", owner: "Emanuel", due_date: "Before Jul 2026", urgent: false, note: "Must be valid for full stay. EU citizen — no visa needed" },
-        { task_text: "School issues certified final transcript", category: "Documents & Admin", owner: "Emanuel", due_date: "After IB results Jul 2026", urgent: false, note: "Request from Dubai school immediately after results" },
-        { task_text: "Register for BSN number at Amsterdam municipality", category: "Documents & Admin", owner: "Emanuel", due_date: "Within 5 days of arrival", urgent: false, note: "Mandatory for everything. Book at gemeente.amsterdam.nl" },
-        { task_text: "Family flies Dubai to Italy", category: "Travel & Move", owner: "All", due_date: "2 Jul 2026", urgent: false, note: "Tickets already booked" },
-        { task_text: "Book Emanuel flight Sicily to Amsterdam", category: "Travel & Move", owner: "Mamma", due_date: "Book by end Jun 2026", urgent: false, note: "Target late August. Ryanair/easyJet Catania-Amsterdam" },
-        { task_text: "Arrange luggage and ship essential items", category: "Travel & Move", owner: "All", due_date: "August 2026", urgent: false, note: "Consider shipping a box — cheaper than extra baggage" },
-        { task_text: "IKEA run on arrival in Amsterdam", category: "Travel & Move", owner: "Emanuel", due_date: "First week Amsterdam", urgent: false, note: "Bedding, kitchen basics. 200-300 euros. IKEA Haarlem is closest" },
-        { task_text: "Arrange Dutch health insurance", category: "Life in Amsterdam", owner: "Francesco", due_date: "From day 1 in NL", urgent: true, note: "Mandatory by law. 130-150/month. Check Zilveren Kruis or CZ" },
-        { task_text: "Get Dutch SIM card / local number", category: "Life in Amsterdam", owner: "Emanuel", due_date: "Day of arrival", urgent: false, note: "Ben, Lebara or Simyo. 10-20/month. Buy at Schiphol" },
-        { task_text: "Open Dutch bank account", category: "Life in Amsterdam", owner: "Emanuel", due_date: "First week Amsterdam", urgent: false, note: "Bunq (no BSN needed to start) or Revolut as bridge" },
-        { task_text: "Get OV-chipkaart (public transport card)", category: "Life in Amsterdam", owner: "Emanuel", due_date: "Day of arrival", urgent: false, note: "7.50 card + load credit. Available at Schiphol" },
-        { task_text: "Set up monthly allowance transfer", category: "Life in Amsterdam", owner: "Francesco", due_date: "Before Emanuel arrives", urgent: false, note: "Target AED 8,000-10,000/month depending on rent" },
-      ];
-
       const OWNER_COLORS = {
         Francesco: { bg: "#e8f5e9", text: "#2d5a3d", border: "#2d5a3d" },
         Mamma: { bg: "#fff8e1", text: "#b45309", border: "#f59e0b" },
-        Emanuel: { bg: "#e3f2fd", text: "#1565c0", border: "#1976d2" },
+        Emanuel: { bg: "#dbeafe", text: "#1565c0", border: "#1976d2" },
         All: { bg: "#f3f4f6", text: "#374151", border: "#9ca3af" },
       };
 
-      const CATEGORIES = ["All Tasks", "University & Enrollment", "Housing", "Documents & Admin", "Travel & Move", "Life in Amsterdam"];
+      const CATEGORIES = ["University & Enrollment", "Housing", "Documents & Admin", "Travel & Move", "Life in Amsterdam"];
+      const ALL_CATEGORIES = ["All Tasks", ...CATEGORIES];
       const OWNERS = ["All", "Francesco", "Mamma", "Emanuel"];
 
+      const INITIAL_TASKS = [
+        { task_text: "Check IB results on candidate portal", category: "University & Enrollment", owner: "Emanuel", due_date: "5 Jul 2026", urgent: true, note: "Do first thing that morning", completed: false },
+        { task_text: "Email VU International Student Advisor with transcript", category: "University & Enrollment", owner: "Emanuel", due_date: "5 Jul 2026", urgent: true, note: "Attach digital transcript from IB portal same day", completed: false },
+        { task_text: "Pay tuition fee via Studielink", category: "University & Enrollment", owner: "Francesco", due_date: "Week of 7 Jul 2026", urgent: false, note: "2,700 EU rate — needs SEPA or international transfer", completed: false },
+        { task_text: "Send certified copy of IB diploma to VU by post", category: "University & Enrollment", owner: "Emanuel", due_date: "Before 1 Aug 2026", urgent: false, note: "Post to: De Boelelaan 1105, 1081 HV Amsterdam", completed: false },
+        { task_text: "Confirm full enrolment status on Studielink", category: "University & Enrollment", owner: "Emanuel", due_date: "Before 31 Aug 2026", urgent: false, note: "Status must show enrolled — hard deadline", completed: false },
+        { task_text: "Register for VU introduction week", category: "University & Enrollment", owner: "Emanuel", due_date: "July 2026", urgent: false, note: "Important for settling in socially", completed: false },
+        { task_text: "Register on HousingAnywhere via VU priority link", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: true, note: "Email vip@housinganywhere.com — 20% discount", completed: false },
+        { task_text: "Register on Room.nl (DUWO student housing)", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: true, note: "Queue-based — every week counts. Free.", completed: false },
+        { task_text: "Register on Spotahome", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: false, note: "Verified listings with video tours", completed: false },
+        { task_text: "Register on Kamernet", category: "Housing", owner: "Emanuel", due_date: "This week", urgent: false, note: "Largest NL platform. Set alerts for 700-1,000", completed: false },
+        { task_text: "Check VU accommodation queue status", category: "Housing", owner: "Emanuel", due_date: "Weekly check", urgent: false, note: "VU housing first-paid-first-served", completed: false },
+        { task_text: "Sign rental contract", category: "Housing", owner: "Emanuel", due_date: "As soon as found", urgent: false, note: "Confirm BSN registration possible before signing", completed: false },
+        { task_text: "Pay first month and deposit", category: "Housing", owner: "Francesco", due_date: "On contract signing", urgent: false, note: "Target under 1,000/month. Budget 1-2 months deposit", completed: false },
+        { task_text: "Initiate apostille process for Italian documents", category: "Documents & Admin", owner: "Francesco", due_date: "Immediately", urgent: true, note: "Long lead time — start now. Birth certificate minimum", completed: false },
+        { task_text: "Check Emanuel passport expiry", category: "Documents & Admin", owner: "Emanuel", due_date: "Before Jul 2026", urgent: false, note: "Must be valid for full stay. EU citizen — no visa needed", completed: false },
+        { task_text: "School issues certified final transcript", category: "Documents & Admin", owner: "Emanuel", due_date: "After IB results Jul 2026", urgent: false, note: "Request from Dubai school immediately after results", completed: false },
+        { task_text: "Register for BSN at Amsterdam municipality", category: "Documents & Admin", owner: "Emanuel", due_date: "Within 5 days of arrival", urgent: false, note: "Mandatory for everything. Book at gemeente.amsterdam.nl", completed: false },
+        { task_text: "Family flies Dubai to Italy", category: "Travel & Move", owner: "All", due_date: "2 Jul 2026", urgent: false, note: "Tickets already booked", completed: false },
+        { task_text: "Book Emanuel flight Sicily to Amsterdam", category: "Travel & Move", owner: "Mamma", due_date: "Book by end Jun 2026", urgent: false, note: "Target late August. Ryanair/easyJet Catania-Amsterdam", completed: false },
+        { task_text: "Arrange luggage and ship essential items", category: "Travel & Move", owner: "All", due_date: "August 2026", urgent: false, note: "Consider shipping a box — cheaper than extra baggage", completed: false },
+        { task_text: "IKEA run on arrival in Amsterdam", category: "Travel & Move", owner: "Emanuel", due_date: "First week Amsterdam", urgent: false, note: "Bedding, kitchen basics. IKEA Haarlem is closest", completed: false },
+        { task_text: "Arrange Dutch health insurance", category: "Life in Amsterdam", owner: "Francesco", due_date: "From day 1 in NL", urgent: true, note: "Mandatory by law. 130-150/month. Check Zilveren Kruis or CZ", completed: false },
+        { task_text: "Get Dutch SIM card", category: "Life in Amsterdam", owner: "Emanuel", due_date: "Day of arrival", urgent: false, note: "Ben, Lebara or Simyo. 10-20/month. Buy at Schiphol", completed: false },
+        { task_text: "Open Dutch bank account", category: "Life in Amsterdam", owner: "Emanuel", due_date: "First week Amsterdam", urgent: false, note: "Bunq (no BSN needed to start) or Revolut as bridge", completed: false },
+        { task_text: "Get OV-chipkaart", category: "Life in Amsterdam", owner: "Emanuel", due_date: "Day of arrival", urgent: false, note: "7.50 card + load credit. Available at Schiphol", completed: false },
+        { task_text: "Set up monthly allowance transfer", category: "Life in Amsterdam", owner: "Francesco", due_date: "Before Emanuel arrives", urgent: false, note: "Target AED 8,000-10,000/month depending on rent", completed: false },
+      ];
+
       const HOUSING_AGENCIES = [
-        { name: "HousingAnywhere", badge: "VU Partner", desc: "VU partner — 20% discount via vip@housinganywhere.com. Verified, secure payments, reviews.", url: "https://housinganywhere.com", color: "#2d5a3d" },
-        { name: "Room.nl / DUWO", badge: "Free to register", desc: "Official Dutch student housing. Register immediately — queue-based, every week counts.", url: "https://room.nl", color: "#1565c0" },
-        { name: "Spotahome", badge: "Verified visits", desc: "Team physically visits every property. Landlord ratings. Good for remote booking.", url: "https://spotahome.com/amsterdam", color: "#7c3aed" },
-        { name: "Kamernet", badge: "Set alerts", desc: "Largest NL platform. Mixed quality — set alerts 700-1,000 Amsterdam.", url: "https://kamernet.nl", color: "#b45309" },
-        { name: "Hospi Housing", badge: "VU Recommended", desc: "VU-recommended homestay. Hundreds of verified host families. Free to use.", url: "https://hospihousing.com", color: "#be185d" },
+        { name: "HousingAnywhere", badge: "VU Partner", desc: "20% discount via vip@housinganywhere.com. Verified, secure payments.", url: "https://housinganywhere.com", color: "#1e6eb5" },
+        { name: "Room.nl / DUWO", badge: "Free", desc: "Official Dutch student housing. Register immediately — queue-based.", url: "https://room.nl", color: "#2d5a3d" },
+        { name: "Spotahome", badge: "Verified visits", desc: "Team physically visits every property. Good for remote booking.", url: "https://spotahome.com/amsterdam", color: "#7c3aed" },
+        { name: "Kamernet", badge: "Set alerts", desc: "Largest NL platform. Set alerts 700-1,000 Amsterdam.", url: "https://kamernet.nl", color: "#b45309" },
+        { name: "Hospi Housing", badge: "VU Recommended", desc: "VU-recommended homestay. Verified host families. Free to use.", url: "https://hospihousing.com", color: "#be185d" },
       ];
 
       const ONE_OFF_COSTS = [
@@ -79,11 +137,11 @@
         { item: "First month rent", eur: "800-1,000", who: "Francesco" },
         { item: "VU housing application fee", eur: "500", who: "Done" },
         { item: "HousingAnywhere subscription", eur: "26-55", who: "Emanuel" },
-        { item: "Bedding and household essentials IKEA", eur: "200-300", who: "Francesco" },
+        { item: "Bedding and essentials IKEA", eur: "200-300", who: "Francesco" },
         { item: "Books and study materials", eur: "200-400", who: "Emanuel" },
-        { item: "OV-chipkaart + initial load", eur: "50", who: "Emanuel" },
+        { item: "OV-chipkaart + load", eur: "50", who: "Emanuel" },
         { item: "Dutch SIM card", eur: "20-30", who: "Emanuel" },
-        { item: "Dutch health insurance first month", eur: "130-150", who: "Francesco" },
+        { item: "Health insurance first month", eur: "130-150", who: "Francesco" },
         { item: "Apostille documents", eur: "100-200", who: "Francesco" },
         { item: "Misc buffer", eur: "300", who: "-" },
       ];
@@ -98,13 +156,100 @@
         { item: "Books and misc", eur: "50-100" },
       ];
 
+      // Icon SVG component
+      function GIcon({ size = 36 }) {
+        const r = size / 2;
+        return (
+          <svg width={size} height={size} viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="#1e6eb5"/>
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#d4af6a" strokeWidth="1.2"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffffff" strokeWidth="0.6" opacity="0.2"/>
+            <circle cx="50" cy="50" r="32" fill="none" stroke="#ffffff" strokeWidth="0.3" opacity="0.12"/>
+            <text x="50" y="57" fontFamily="Futura, Century Gothic, Trebuchet MS, sans-serif" fontSize="52" fontWeight="300" fill="#ffffff" textAnchor="middle" dominantBaseline="middle">G</text>
+            <line x1="33" y1="72" x2="67" y2="72" stroke="#d4af6a" strokeWidth="1"/>
+            <text x="50" y="80" fontFamily="Futura, Century Gothic, sans-serif" fontSize="8" fontWeight="400" fill="#d4af6a" textAnchor="middle" letterSpacing="3">FAMILY</text>
+          </svg>
+        );
+      }
+
+      // Add Task Modal
+      function AddTaskModal({ onClose, onSave, defaultCategory }) {
+        const [text, setText] = useState("");
+        const [category, setCategory] = useState(defaultCategory || CATEGORIES[0]);
+        const [owner, setOwner] = useState("Emanuel");
+        const [dueDate, setDueDate] = useState("");
+        const [note, setNote] = useState("");
+        const [urgent, setUrgent] = useState(false);
+        const [saving, setSaving] = useState(false);
+
+        async function handleSave() {
+          if (!text.trim()) return;
+          setSaving(true);
+          await onSave({ task_text: text.trim(), category, owner, due_date: dueDate, note, urgent, completed: false });
+          setSaving(false);
+          onClose();
+        }
+
+        return (
+          <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+            <div className="modal-box">
+              <div className="modal-title">Add new task</div>
+              <div className="form-field">
+                <label className="form-label">Task</label>
+                <input className="form-input" placeholder="What needs to be done?" value={text} onChange={e => setText(e.target.value)} autoFocus />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Category</label>
+                <select className="form-select" value={category} onChange={e => setCategory(e.target.value)}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div className="form-field" style={{ flex: 1 }}>
+                  <label className="form-label">Owner</label>
+                  <select className="form-select" value={owner} onChange={e => setOwner(e.target.value)}>
+                    {["Francesco", "Mamma", "Emanuel", "All"].map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="form-field" style={{ flex: 1 }}>
+                  <label className="form-label">Due date</label>
+                  <input className="form-input" placeholder="e.g. Jul 2026" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Note (optional)</label>
+                <input className="form-input" placeholder="Any extra detail..." value={note} onChange={e => setNote(e.target.value)} />
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                <div onClick={() => setUrgent(!urgent)} style={{
+                  width: 44, height: 26, borderRadius: 13, cursor: "pointer", transition: "background 0.2s",
+                  background: urgent ? "#f59e0b" : "#e5e7eb", position: "relative"
+                }}>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: 10, background: "#fff",
+                    position: "absolute", top: 3, left: urgent ? 21 : 3, transition: "left 0.2s"
+                  }} />
+                </div>
+                <span style={{ fontSize: 13, color: "#374151" }}>Mark as urgent</span>
+              </div>
+              <button className="btn-primary" onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "Add task"}
+              </button>
+              <button className="btn-cancel" onClick={onClose}>Cancel</button>
+            </div>
+          </div>
+        );
+      }
+
       function App() {
         const [tasks, setTasks] = useState([]);
         const [loading, setLoading] = useState(true);
         const [activeTab, setActiveTab] = useState("tasks");
         const [activeCategory, setActiveCategory] = useState("All Tasks");
         const [activeOwner, setActiveOwner] = useState("All");
+        const [showAdd, setShowAdd] = useState(false);
         const [seeded, setSeeded] = useState(false);
+        const [showInstall, setShowInstall] = useState(true);
 
         useEffect(() => {
           loadTasks();
@@ -117,7 +262,7 @@
 
         async function loadTasks() {
           const { data, error } = await supabase.from("tasks").select("*").order("created_at");
-          if (error) { console.error(error); setLoading(false); return; }
+          if (error) { setLoading(false); return; }
           if (data.length === 0 && !seeded) {
             setSeeded(true);
             await supabase.from("tasks").insert(INITIAL_TASKS);
@@ -134,6 +279,11 @@
           setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !completed } : t));
         }
 
+        async function addTask(taskData) {
+          const { data } = await supabase.from("tasks").insert([taskData]).select();
+          if (data) setTasks(prev => [...prev, ...data]);
+        }
+
         const filtered = tasks.filter(t => {
           const catMatch = activeCategory === "All Tasks" || t.category === activeCategory;
           const ownerMatch = activeOwner === "All" || t.owner === activeOwner;
@@ -146,46 +296,60 @@
         const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
         return (
-          <div style={{ minHeight: "100vh", background: "#faf9f7" }}>
-            <div style={{ background: "#fff", borderBottom: "1px solid #e5e3df", padding: "0 24px", position: "sticky", top: 0, zIndex: 10 }}>
+          <div style={{ minHeight: "100vh", background: "#faf9f7", paddingBottom: 80 }}>
+
+            {/* Install banner */}
+            {showInstall && (
+              <div className="install-banner">
+                <div style={{ fontSize: 13, fontWeight: 500 }}>
+                  Install on iPhone: tap Share then "Add to Home Screen"
+                </div>
+                <button onClick={() => setShowInstall(false)} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", padding: "0 4px" }}>×</button>
+              </div>
+            )}
+
+            {/* Header */}
+            <div style={{ background: "#fff", borderBottom: "1px solid #e5e3df", padding: "0 20px", position: "sticky", top: 0, zIndex: 10 }}>
               <div style={{ maxWidth: 860, margin: "0 auto" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 0 14px" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                      <span style={{ fontSize: 24, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.5px" }}>Guarracino</span>
-                      <span style={{ fontSize: 12, color: "#9ca3af" }}>Family App</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0 12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <GIcon size={44} />
+                    <div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.3px", fontFamily: "Futura, Century Gothic, sans-serif" }}>Guarracino</div>
+                      <div style={{ fontSize: 11, color: "#9ca3af", letterSpacing: "2px", fontFamily: "Futura, Century Gothic, sans-serif" }}>FAMILY</div>
                     </div>
-                    <div style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}>Emanuel to Amsterdam 2026</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 26, fontWeight: 700, color: "#2d5a3d" }}>{progress}%</div>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: "#1e6eb5" }}>{progress}%</div>
                     <div style={{ fontSize: 11, color: "#9ca3af" }}>{completedCount}/{totalCount} done</div>
                   </div>
                 </div>
-                <div style={{ height: 3, background: "#f0ede8", borderRadius: 2, marginBottom: 12 }}>
-                  <div style={{ height: "100%", width: progress + "%", background: "#2d5a3d", borderRadius: 2, transition: "width 0.5s ease" }} />
+                <div style={{ height: 3, background: "#f0ede8", borderRadius: 2, marginBottom: 10 }}>
+                  <div style={{ height: "100%", width: progress + "%", background: "#1e6eb5", borderRadius: 2, transition: "width 0.5s ease" }} />
                 </div>
-                <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
-                  {urgentCount > 0 && <span style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#92400e", fontWeight: 500 }}>urgent {urgentCount}</span>}
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                  {urgentCount > 0 && <span style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#92400e", fontWeight: 500 }}>⚡ {urgentCount} urgent</span>}
                   <span style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#166534", fontWeight: 500 }}>{completedCount} done</span>
                   <span style={{ background: "#f8f9fa", border: "1px solid #e5e7eb", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#6b7280", fontWeight: 500 }}>{totalCount - completedCount} remaining</span>
                 </div>
                 <div style={{ display: "flex" }}>
                   {[["tasks", "Tasks"], ["housing", "Housing"], ["budget", "Budget"]].map(([key, label]) => (
                     <button key={key} onClick={() => setActiveTab(key)} style={{
-                      padding: "9px 18px", fontSize: 13, fontWeight: 500, background: "none", border: "none", cursor: "pointer",
-                      borderBottom: activeTab === key ? "2px solid #2d5a3d" : "2px solid transparent",
-                      color: activeTab === key ? "#2d5a3d" : "#6b7280"
+                      padding: "9px 16px", fontSize: 13, fontWeight: 500, background: "none", border: "none", cursor: "pointer",
+                      borderBottom: activeTab === key ? "2px solid #1e6eb5" : "2px solid transparent",
+                      color: activeTab === key ? "#1e6eb5" : "#6b7280"
                     }}>{label}</button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div style={{ maxWidth: 860, margin: "0 auto", padding: "20px 24px" }}>
+            <div style={{ maxWidth: 860, margin: "0 auto", padding: "20px 20px" }}>
+
+              {/* TASKS TAB */}
               {activeTab === "tasks" && (
                 <div>
-                  <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
                     {OWNERS.map(owner => {
                       const c = owner === "All" ? OWNER_COLORS.All : OWNER_COLORS[owner];
                       return (
@@ -193,25 +357,29 @@
                           padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: "pointer",
                           background: activeOwner === owner ? (owner === "All" ? "#1a1a1a" : c.bg) : "#fff",
                           color: activeOwner === owner ? (owner === "All" ? "#fff" : c.text) : "#6b7280",
-                          border: activeOwner === owner ? "1.5px solid " + (owner === "All" ? "#1a1a1a" : c.border) : "1.5px solid #e5e7eb"
+                          border: "1.5px solid " + (activeOwner === owner ? (owner === "All" ? "#1a1a1a" : c.border) : "#e5e7eb")
                         }}>{owner}</button>
                       );
                     })}
                   </div>
-                  <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
-                    {CATEGORIES.map(cat => (
+                  <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
+                    {ALL_CATEGORIES.map(cat => (
                       <button key={cat} onClick={() => setActiveCategory(cat)} style={{
                         padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: "pointer",
-                        background: activeCategory === cat ? "#2d5a3d" : "#fff",
+                        background: activeCategory === cat ? "#1e6eb5" : "#fff",
                         color: activeCategory === cat ? "#fff" : "#6b7280",
-                        border: activeCategory === cat ? "1.5px solid #2d5a3d" : "1.5px solid #e5e7eb"
+                        border: "1.5px solid " + (activeCategory === cat ? "#1e6eb5" : "#e5e7eb")
                       }}>{cat}</button>
                     ))}
                   </div>
+
                   {loading ? (
-                    <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>Loading tasks...</div>
+                    <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>Loading...</div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {filtered.length === 0 && (
+                        <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>No tasks here.</div>
+                      )}
                       {filtered.map(task => {
                         const c = OWNER_COLORS[task.owner] || OWNER_COLORS.All;
                         return (
@@ -220,19 +388,19 @@
                             border: "1px solid " + (task.completed ? "#f0ede8" : "#e5e3df"),
                             borderRadius: 10, padding: "13px 16px", cursor: "pointer",
                             display: "flex", gap: 12, alignItems: "flex-start",
-                            opacity: task.completed ? 0.55 : 1,
+                            opacity: task.completed ? 0.5 : 1,
                             boxShadow: task.completed ? "none" : "0 1px 3px rgba(0,0,0,0.04)"
                           }}>
                             <div style={{
-                              width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
-                              background: task.completed ? "#2d5a3d" : "#fff",
-                              border: "2px solid " + (task.completed ? "#2d5a3d" : "#d1d5db"),
+                              width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                              background: task.completed ? "#1e6eb5" : "#fff",
+                              border: "2px solid " + (task.completed ? "#1e6eb5" : "#d1d5db"),
                               display: "flex", alignItems: "center", justifyContent: "center"
                             }}>
-                              {task.completed && <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>v</span>}
+                              {task.completed && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>✓</span>}
                             </div>
                             <div style={{ flex: 1 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 5 }}>
                                 <span style={{ fontSize: 14, fontWeight: 500, color: task.completed ? "#9ca3af" : "#1a1a1a", textDecoration: task.completed ? "line-through" : "none" }}>{task.task_text}</span>
                                 {task.urgent && !task.completed && <span style={{ fontSize: 10, fontWeight: 600, background: "#fef3c7", color: "#92400e", padding: "2px 7px", borderRadius: 10, border: "1px solid #fcd34d" }}>URGENT</span>}
                               </div>
@@ -250,29 +418,29 @@
                 </div>
               )}
 
+              {/* HOUSING TAB */}
               {activeTab === "housing" && (
                 <div>
                   <div style={{ marginBottom: 20 }}>
                     <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a1a", marginBottom: 4 }}>Housing Platforms</div>
                     <div style={{ fontSize: 13, color: "#6b7280" }}>Register on all 5. More registrations = better chances.</div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {HOUSING_AGENCIES.map(agency => (
                       <a key={agency.name} href={agency.url} target="_blank" rel="noopener noreferrer">
                         <div style={{
-                          background: "#fff", border: "1px solid #e5e3df", borderRadius: 12, padding: "16px 20px",
-                          display: "flex", alignItems: "center", gap: 16,
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                          borderLeft: "4px solid " + agency.color
+                          background: "#fff", border: "1px solid #e5e3df", borderRadius: 12, padding: "15px 18px",
+                          display: "flex", alignItems: "center", gap: 14,
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.04)", borderLeft: "4px solid " + agency.color
                         }}>
                           <div style={{ flex: 1 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                               <span style={{ fontSize: 14, fontWeight: 600, color: "#1a1a1a" }}>{agency.name}</span>
-                              <span style={{ fontSize: 10, fontWeight: 600, color: agency.color, padding: "2px 8px", borderRadius: 10, border: "1px solid " + agency.color }}>{agency.badge}</span>
+                              <span style={{ fontSize: 10, fontWeight: 600, color: agency.color, padding: "2px 7px", borderRadius: 10, border: "1px solid " + agency.color }}>{agency.badge}</span>
                             </div>
-                            <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5 }}>{agency.desc}</div>
+                            <div style={{ fontSize: 12, color: "#6b7280" }}>{agency.desc}</div>
                           </div>
-                          <div style={{ fontSize: 18, color: "#9ca3af" }}>-&gt;</div>
+                          <div style={{ color: "#9ca3af", fontSize: 16 }}>→</div>
                         </div>
                       </a>
                     ))}
@@ -280,20 +448,21 @@
                 </div>
               )}
 
+              {/* BUDGET TAB */}
               {activeTab === "budget" && (
                 <div>
-                  <div style={{ marginBottom: 28 }}>
+                  <div style={{ marginBottom: 24 }}>
                     <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a1a", marginBottom: 4 }}>One-Off Setup Costs</div>
-                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 16 }}>Total estimate: 7,000-10,000 EUR</div>
+                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 14 }}>Total estimate: 7,000-10,000 EUR</div>
                     <div style={{ background: "#fff", border: "1px solid #e5e3df", borderRadius: 12, overflow: "hidden" }}>
                       {ONE_OFF_COSTS.map((row, i) => (
                         <div key={i} style={{
                           display: "flex", justifyContent: "space-between", alignItems: "center",
-                          padding: "11px 16px", borderBottom: i < ONE_OFF_COSTS.length - 1 ? "1px solid #f0ede8" : "none",
+                          padding: "10px 16px", borderBottom: i < ONE_OFF_COSTS.length - 1 ? "1px solid #f0ede8" : "none",
                           background: i % 2 === 0 ? "#fff" : "#faf9f7"
                         }}>
                           <span style={{ fontSize: 13, color: "#374151" }}>{row.item}</span>
-                          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
                             <span style={{ fontSize: 12, color: "#9ca3af" }}>{row.who}</span>
                             <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", minWidth: 80, textAlign: "right" }}>{row.eur}</span>
                           </div>
@@ -303,27 +472,45 @@
                   </div>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a1a", marginBottom: 4 }}>Monthly Running Costs</div>
-                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 16 }}>1,425-1,820 EUR/month · AED 8,000-10,000 allowance</div>
+                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 14 }}>1,425-1,820 EUR/month</div>
                     <div style={{ background: "#fff", border: "1px solid #e5e3df", borderRadius: 12, overflow: "hidden" }}>
                       {MONTHLY_COSTS.map((row, i) => (
                         <div key={i} style={{
                           display: "flex", justifyContent: "space-between", alignItems: "center",
-                          padding: "11px 16px", borderBottom: i < MONTHLY_COSTS.length - 1 ? "1px solid #f0ede8" : "none",
+                          padding: "10px 16px", borderBottom: i < MONTHLY_COSTS.length - 1 ? "1px solid #f0ede8" : "none",
                           background: i % 2 === 0 ? "#fff" : "#faf9f7"
                         }}>
                           <span style={{ fontSize: 13, color: "#374151" }}>{row.item}</span>
                           <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{row.eur}</span>
                         </div>
                       ))}
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "13px 16px", background: "#f0fdf4", borderTop: "2px solid #bbf7d0" }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#166534" }}>Monthly Total</span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#166534" }}>1,425-1,820 EUR</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 16px", background: "#eff6ff", borderTop: "2px solid #bfdbfe" }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#1e40af" }}>Monthly Total</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#1e40af" }}>1,425-1,820 EUR</span>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
+
+            {/* Floating Add Button — only on tasks tab */}
+            {activeTab === "tasks" && (
+              <button className="add-fab" onClick={() => setShowAdd(true)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
+
+            {/* Add Task Modal */}
+            {showAdd && (
+              <AddTaskModal
+                onClose={() => setShowAdd(false)}
+                onSave={addTask}
+                defaultCategory={activeCategory !== "All Tasks" ? activeCategory : CATEGORIES[0]}
+              />
+            )}
           </div>
         );
       }
