@@ -474,15 +474,24 @@
         var [loading, setLoading] = useState(true);
         var [showAdd, setShowAdd] = useState(false);
         var [editEntry, setEditEntry] = useState(null);
+        var [monthlyBudget, setMonthlyBudget] = useState(function(){ try { return parseFloat(localStorage.getItem("eman_budget")||"1600"); } catch(e){ return 1600; } });
+        var [editingBudget, setEditingBudget] = useState(false);
+        var [budgetInput, setBudgetInput] = useState("");
         var today = new Date();
         var [viewMonth, setViewMonth] = useState(today.getMonth());
         var [viewYear, setViewYear] = useState(today.getFullYear());
 
         useEffect(function(){
-          supabase.from("spending").select("*").eq("person","Emanuel").order("spend_date",{ascending:false}).then(function(r){
-            setEntries(r.data || []);
-            setLoading(false);
-          });
+          function load() {
+            supabase.from("spending").select("*").eq("person","Emanuel").order("spend_date",{ascending:false}).then(function(r){
+              if (r.error) { setLoading(false); return; }
+              setEntries(r.data || []);
+              setLoading(false);
+            });
+          }
+          load();
+          var ch = supabase.channel("spending-changes").on("postgres_changes",{event:"*",schema:"public",table:"spending"},load).subscribe();
+          return function(){ supabase.removeChannel(ch); };
         }, []);
 
         function addEntry(data) {
@@ -549,6 +558,34 @@
                 <div style={{fontSize:22,fontWeight:700,color:"#1e6eb5",marginTop:2}}>EUR {monthTotal.toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
               </div>
               <button onClick={nextMonth} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:"#6b7280",padding:"0 8px"}}>→</button>
+            </div>
+
+            {/* Monthly budget target */}
+            <div style={{background:"#fff",border:"1px solid #e5e3df",borderRadius:12,padding:"12px 16px",marginBottom:16}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <span style={{fontSize:12,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1px"}}>Monthly Budget</span>
+                {!editingBudget && <button onClick={function(){setBudgetInput(String(monthlyBudget));setEditingBudget(true);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:"#1e6eb5"}}>Edit</button>}
+              </div>
+              {editingBudget ? (
+                <div style={{display:"flex",gap:8}}>
+                  <input value={budgetInput} onChange={function(e){setBudgetInput(e.target.value);}} style={{flex:1,padding:"6px 10px",border:"1.5px solid #1e6eb5",borderRadius:8,fontSize:14,outline:"none"}} type="number" autoFocus />
+                  <button onClick={function(){ var v=parseFloat(budgetInput); if(!isNaN(v)){ setMonthlyBudget(v); try{localStorage.setItem("eman_budget",String(v));}catch(e){} } setEditingBudget(false); }} style={{padding:"6px 12px",background:"#1e6eb5",color:"#fff",border:"none",borderRadius:8,fontSize:12,cursor:"pointer"}}>Save</button>
+                  <button onClick={function(){setEditingBudget(false);}} style={{padding:"6px 10px",background:"#fff",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:12,cursor:"pointer"}}>x</button>
+                </div>
+              ) : (
+                <div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                    <span style={{fontSize:13,color:"#374151"}}>EUR {monthTotal.toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2})} spent</span>
+                    <span style={{fontSize:13,fontWeight:600,color:monthTotal>monthlyBudget?"#dc2626":"#166534"}}>
+                      {monthTotal>monthlyBudget ? "EUR "+(monthTotal-monthlyBudget).toFixed(2)+" over" : "EUR "+(monthlyBudget-monthTotal).toFixed(2)+" left"}
+                    </span>
+                  </div>
+                  <div style={{height:8,background:"#f0ede8",borderRadius:4,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:Math.min((monthTotal/monthlyBudget)*100,100)+"%",background:monthTotal>monthlyBudget?"#dc2626":monthTotal/monthlyBudget>0.8?"#f59e0b":"#1e6eb5",borderRadius:4,transition:"width 0.4s"}} />
+                  </div>
+                  <div style={{fontSize:11,color:"#9ca3af",marginTop:4,textAlign:"right"}}>Budget: EUR {monthlyBudget.toLocaleString()}/month</div>
+                </div>
+              )}
             </div>
 
             {/* Category breakdown */}
@@ -624,9 +661,11 @@
         var [description, setDescription] = useState(entry ? entry.description : "");
         var [spendDate, setSpendDate] = useState(entry ? entry.spend_date : new Date().toISOString().split("T")[0]);
         var [confirm, setConfirm] = useState(false);
+        var [saving, setSaving] = useState(false);
 
         function handleSave() {
           if (!amount || isNaN(parseFloat(amount))) return;
+          setSaving(true);
           props.onSave({amount:parseFloat(amount),category:category,description:description,spend_date:spendDate});
         }
 
@@ -659,7 +698,7 @@
                 <label className="form-label">Date</label>
                 <input className="form-input" type="date" value={spendDate} onChange={function(e){setSpendDate(e.target.value);}} />
               </div>
-              <button className="btn-primary" onClick={handleSave}>{isEdit?"Save changes":"Add expense"}</button>
+              <button className="btn-primary" onClick={handleSave} disabled={saving} style={{opacity:saving?0.7:1}}>{saving?"Saving...":isEdit?"Save changes":"Add expense"}</button>
               {isEdit && !confirm && <button className="btn-danger" onClick={function(){setConfirm(true);}}>Delete expense</button>}
               {isEdit && confirm && (
                 <div style={{background:"#fef2f2",border:"1.5px solid #fecaca",borderRadius:12,padding:"14px 16px",marginTop:8}}>
@@ -803,10 +842,15 @@
         var [filterStatus, setFilterStatus] = useState("all");
 
         useEffect(function(){
-          supabase.from("housing_listings").select("*").order("created_at").then(function(r){
-            setApts(r.data || []);
-            setLoading(false);
-          });
+          function load() {
+            supabase.from("housing_listings").select("*").order("created_at").then(function(r){
+              setApts(r.data || []);
+              setLoading(false);
+            });
+          }
+          load();
+          var ch = supabase.channel("apartments-changes").on("postgres_changes",{event:"*",schema:"public",table:"housing_listings"},load).subscribe();
+          return function(){ supabase.removeChannel(ch); };
         }, []);
 
         function saveApt(data) {
@@ -932,6 +976,12 @@
 
         useEffect(function(){
           loadBudget();
+        }, []);
+
+        useEffect(function(){
+          var ch1 = supabase.channel("budget-oneoff-changes").on("postgres_changes",{event:"*",schema:"public",table:"budget_oneoff"},loadBudget).subscribe();
+          var ch2 = supabase.channel("budget-monthly-changes").on("postgres_changes",{event:"*",schema:"public",table:"budget_monthly"},loadBudget).subscribe();
+          return function(){ supabase.removeChannel(ch1); supabase.removeChannel(ch2); };
         }, []);
 
         function loadBudget() {
@@ -1078,7 +1128,7 @@
           supabase.from("tasks").select("*").order("created_at").then(function(result){
             var data = result.data;
             var error = result.error;
-            if (error) { setLoading(false); return; }
+            if (error) { setLoading(false); console.error("Tasks load error:", error); return; }
             if (data.length === 0 && !seeded) {
               setSeeded(true);
               supabase.from("tasks").insert(INITIAL_TASKS).then(function(){
