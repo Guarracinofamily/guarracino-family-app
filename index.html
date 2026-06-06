@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+      body { background: #ffffff; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
       button { font-family: inherit; } a { text-decoration: none; }
       input, textarea, select { font-family: inherit; }
       .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; justify-content: center; z-index: 100; }
@@ -1411,7 +1411,7 @@
         var progress = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
 
         return (
-          <div style={{minHeight:"100vh",background:"#faf9f7",paddingBottom:80,paddingTop:showInstall?46:0}}>
+          <div style={{minHeight:"100vh",background:"#f4f6f8",paddingBottom:80,paddingTop:showInstall?46:0}}>
 
             {showInstall && (
               <div className="install-banner">
@@ -1465,7 +1465,7 @@
               </div>
             </div>
 
-            <div style={{maxWidth:860,margin:"0 auto",padding:"20px"}}>
+            <div style={{maxWidth:860,margin:"0 auto",padding:"20px",minHeight:"calc(100vh - 200px)"}}>
 
               {activeTab==="tasks" && (
                 <div>
