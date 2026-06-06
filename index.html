@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+      body { background: #faf9f7; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; } @media (max-width: 480px) { .modal-box { padding: 20px 16px 32px; } }
       button { font-family: inherit; } a { text-decoration: none; }
       input, textarea, select { font-family: inherit; }
 
@@ -34,7 +34,7 @@
       .btn-cancel { width: 100%; padding: 12px; background: none; color: #6b7280; border: none; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 4px; }
       .add-fab { position: fixed; bottom: 28px; right: 24px; width: 56px; height: 56px; border-radius: 28px; background: #1e6eb5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(30,110,181,0.4); z-index: 50; transition: transform 0.15s; }
       .add-fab:active { transform: scale(0.93); }
-      .install-banner { background: #1e6eb5; color: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .install-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: #1e6eb5; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
       .task-card { background: #fff; border: 1px solid #e5e3df; border-radius: 10px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.15s; user-select: none; }
       .task-card:active { transform: scale(0.99); }
       .note-bubble { background: #f0f7ff; border-radius: 8px; padding: 8px 12px; margin-top: 6px; font-size: 12px; color: #374151; border-left: 3px solid #1e6eb5; }
@@ -307,11 +307,11 @@
         return (
           <div className="task-card" style={{flexDirection:"column",padding:0,opacity:task.completed ? 0.55 : 1}}>
             <div style={{display:"flex",gap:12,alignItems:"flex-start",padding:"13px 16px"}}
-              onClick={() => onToggle(task.id, task.completed)}
               onMouseDown={handlePressStart} onMouseUp={handlePressEnd}
               onTouchStart={handlePressStart} onTouchEnd={handlePressEnd}>
-              <div style={{width:22,height:22,borderRadius:6,flexShrink:0,marginTop:1,background:task.completed?"#1e6eb5":"#fff",border:"2px solid "+(task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center"}}>
-                {task.completed && <span style={{color:"#fff",fontSize:12,fontWeight:700}}>✓</span>}
+              <div onClick={e => {e.stopPropagation();onToggle(task.id,task.completed);}}
+                style={{width:32,height:32,borderRadius:8,flexShrink:0,marginTop:-2,background:task.completed?"#1e6eb5":"#fff",border:"2px solid "+(task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",minWidth:32}}>
+                {task.completed && <span style={{color:"#fff",fontSize:14,fontWeight:700}}>✓</span>}
               </div>
               <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
@@ -324,11 +324,11 @@
                   {task.note && <span style={{fontSize:11,color:"#6b7280",fontStyle:"italic"}}>· {task.note}</span>}
                 </div>
               </div>
-              <div style={{display:"flex",gap:6,flexShrink:0}}>
-                <button onClick={e => {e.stopPropagation();setExpanded(!expanded);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#9ca3af",padding:"2px 4px"}}>
-                  {expanded ? "▲" : "▼"}
+              <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"center"}}>
+                <button onClick={e => {e.stopPropagation();setExpanded(!expanded);}} style={{background:expanded?"#eff6ff":"#f8f9fa",border:"1px solid "+(expanded?"#bfdbfe":"#e5e7eb"),borderRadius:6,cursor:"pointer",fontSize:11,color:expanded?"#1e6eb5":"#9ca3af",padding:"3px 7px",fontWeight:500,display:"flex",alignItems:"center",gap:3}}>
+                  💬 {(() => { try { return JSON.parse(task.notes_thread||"[]").length; } catch(e) { return 0; } })()} {expanded ? "▲" : "▼"}
                 </button>
-                <button onClick={e => {e.stopPropagation();onEdit(task);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#9ca3af",padding:"2px 4px"}}>✏️</button>
+                <button onClick={e => {e.stopPropagation();onEdit(task);}} style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:6,cursor:"pointer",fontSize:11,color:"#9ca3af",padding:"3px 7px"}}>✏️</button>
               </div>
             </div>
             {expanded && (
@@ -372,6 +372,7 @@
         const [showInstall, setShowInstall] = useState(true);
         const [showDone, setShowDone] = useState(false);
         const [quickFilter, setQuickFilter] = useState(null); // null | 'urgent' | 'done' | 'remaining'
+        const [sortBy, setSortBy] = useState('default'); // 'default' | 'deadline'
 
         useEffect(() => {
           loadTasks();
@@ -422,10 +423,18 @@
           (activeCategory === "All Tasks" || t.category === activeCategory) &&
           (activeOwner === "All" || t.owner === activeOwner)
         );
+        const DATE_PRIORITY = {'Immediately':0,'This week':1,'Book by end Jun 2026':2,'2 Jul 2026':3,'5 Jul 2026':4,'Week of 7 Jul 2026':5,'Before Jul 2026':6,'July 2026':7,'Before 1 Aug 2026':8,'August 2026':9,'Before 31 Aug 2026':10,'Late Aug 2026':11,'As soon as found':12,'On contract signing':13,'Weekly check':14,'First week Amsterdam':15,'Day of arrival':16,'Within 5 days of arrival':17,'Before Emanuel arrives':18};
         const activeTasks = allFiltered.filter(t => {
           if (quickFilter === 'urgent') return t.urgent && !t.completed;
           if (quickFilter === 'remaining') return !t.completed;
           return !t.completed;
+        }).sort((a,b) => {
+          if (sortBy === 'deadline') {
+            const ap = a.urgent ? -1 : (DATE_PRIORITY[a.due_date] ?? 99);
+            const bp = b.urgent ? -1 : (DATE_PRIORITY[b.due_date] ?? 99);
+            return ap - bp;
+          }
+          return 0;
         });
         const doneTasks = quickFilter === 'urgent' || quickFilter === 'remaining' ? [] : allFiltered.filter(t => t.completed);
 
@@ -435,7 +444,7 @@
         const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
         return (
-          <div style={{minHeight:"100vh",background:"#faf9f7",paddingBottom:80}}>
+          <div style={{minHeight:"100vh",background:"#faf9f7",paddingBottom:80,paddingTop:showInstall?44:0}}>
             {showInstall && (
               <div className="install-banner">
                 <div style={{fontSize:13,fontWeight:500}}>Install on iPhone: tap Share then "Add to Home Screen"</div>
@@ -458,8 +467,8 @@
                     <div style={{fontSize:11,color:"#9ca3af"}}>{completedCount}/{totalCount} done</div>
                   </div>
                 </div>
-                <div style={{height:3,background:"#f0ede8",borderRadius:2,marginBottom:10}}>
-                  <div style={{height:"100%",width:progress+"%",background:"#1e6eb5",borderRadius:2,transition:"width 0.5s"}} />
+                <div style={{height:8,background:"#e5e7eb",borderRadius:4,marginBottom:10,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:progress+"%",background:"linear-gradient(90deg, #93c5fd, #1e6eb5)",borderRadius:4,transition:"width 0.6s ease",minWidth:progress>0?"8px":"0"}} />
                 </div>
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
                   {urgentCount > 0 && (
@@ -494,6 +503,13 @@
                       const c = OWNER_COLORS[owner] || OWNER_COLORS.All;
                       return <button key={owner} onClick={() => setActiveOwner(owner)} style={{padding:"5px 14px",borderRadius:20,fontSize:12,fontWeight:500,cursor:"pointer",background:activeOwner===owner?(owner==="All"?"#1a1a1a":c.bg):"#fff",color:activeOwner===owner?(owner==="All"?"#fff":c.text):"#6b7280",border:"1.5px solid "+(activeOwner===owner?(owner==="All"?"#1a1a1a":c.border):"#e5e7eb")}}>{owner}</button>;
                     })}
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                    <div style={{fontSize:11,fontWeight:600,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"0.5px"}}>Sort</div>
+                    <div style={{display:"flex",gap:6}}>
+                      <button onClick={()=>setSortBy('default')} style={{padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:sortBy==='default'?"#1e6eb5":"#fff",color:sortBy==='default'?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==='default'?"#1e6eb5":"#e5e7eb")}}>Default</button>
+                      <button onClick={()=>setSortBy('deadline')} style={{padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:500,cursor:"pointer",background:sortBy==='deadline'?"#1e6eb5":"#fff",color:sortBy==='deadline'?"#fff":"#6b7280",border:"1.5px solid "+(sortBy==='deadline'?"#1e6eb5":"#e5e7eb")}}>By deadline</button>
+                    </div>
                   </div>
                   <div style={{display:"flex",gap:6,marginBottom:18,flexWrap:"wrap"}}>
                     {ALL_CATEGORIES.map(cat => (
