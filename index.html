@@ -212,10 +212,19 @@
                 <span style={{fontSize:13,color:"#374151"}}>Mark as urgent</span>
               </div>
               <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : isEdit ? "Save changes" : "Add task"}</button>
-              {isEdit && (
-                <button className="btn-danger" onClick={handleDelete}>
-                  {confirmDelete ? "Tap again to confirm delete" : "Delete task"}
+              {isEdit && !confirmDelete && (
+                <button className="btn-danger" onClick={() => setConfirmDelete(true)}>
+                  Delete task
                 </button>
+              )}
+              {isEdit && confirmDelete && (
+                <div style={{background:"#fef2f2",border:"1.5px solid #fecaca",borderRadius:12,padding:"14px 16px",marginTop:8}}>
+                  <div style={{fontSize:13,fontWeight:600,color:"#dc2626",marginBottom:10}}>Delete this task permanently?</div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={handleDelete} style={{flex:1,padding:"10px",background:"#dc2626",color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer"}}>Yes, delete</button>
+                    <button onClick={() => setConfirmDelete(false)} style={{flex:1,padding:"10px",background:"#fff",color:"#374151",border:"1.5px solid #e5e7eb",borderRadius:8,fontSize:13,cursor:"pointer"}}>Cancel</button>
+                  </div>
+                </div>
               )}
               <button className="btn-cancel" onClick={onClose}>Cancel</button>
             </div>
@@ -293,6 +302,7 @@
       }
 
       function TaskCard({task, onToggle, onEdit, onAddNote}) {
+        const [completing, setCompleting] = useState(false);
         const [expanded, setExpanded] = useState(false);
         const pressTimer = useRef(null);
         const c = OWNER_COLORS[task.owner] || OWNER_COLORS.All;
@@ -303,15 +313,24 @@
         function handlePressEnd() {
           clearTimeout(pressTimer.current);
         }
+        async function handleComplete(e) {
+          e.stopPropagation();
+          if (!task.completed) {
+            setCompleting(true);
+            setTimeout(() => { onToggle(task.id, task.completed); setCompleting(false); }, 400);
+          } else {
+            onToggle(task.id, task.completed);
+          }
+        }
 
         return (
           <div className="task-card" style={{flexDirection:"column",padding:0,opacity:task.completed ? 0.55 : 1}}>
             <div style={{display:"flex",gap:12,alignItems:"flex-start",padding:"13px 16px"}}
               onMouseDown={handlePressStart} onMouseUp={handlePressEnd}
               onTouchStart={handlePressStart} onTouchEnd={handlePressEnd}>
-              <div onClick={e => {e.stopPropagation();onToggle(task.id,task.completed);}}
-                style={{width:32,height:32,borderRadius:8,flexShrink:0,marginTop:-2,background:task.completed?"#1e6eb5":"#fff",border:"2px solid "+(task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",minWidth:32}}>
-                {task.completed && <span style={{color:"#fff",fontSize:14,fontWeight:700}}>✓</span>}
+              <div onClick={handleComplete}
+                style={{width:36,height:36,borderRadius:9,flexShrink:0,marginTop:-2,background:completing?"#22c55e":task.completed?"#1e6eb5":"#fff",border:"2px solid "+(completing?"#22c55e":task.completed?"#1e6eb5":"#d1d5db"),display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",minWidth:36,transition:"all 0.3s ease",transform:completing?"scale(1.15)":"scale(1)"}}>
+                {(task.completed||completing) && <span style={{color:"#fff",fontSize:15,fontWeight:700}}>✓</span>}
               </div>
               <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
@@ -320,7 +339,16 @@
                 </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                   <span style={{fontSize:11,background:c.bg,color:c.text,padding:"2px 8px",borderRadius:10,fontWeight:500}}>{task.owner}</span>
-                  {task.due_date && <span style={{fontSize:11,color:"#9ca3af"}}>{task.due_date}</span>}
+                  {task.due_date && (() => {
+                    const days = daysUntil(task.due_date);
+                    const isNear = days !== null && days <= 7 && days >= 0;
+                    const isOverdue = days !== null && days < 0;
+                    return (
+                      <span style={{fontSize:11,color:isOverdue?"#dc2626":isNear?"#d97706":"#9ca3af",fontWeight:isNear||isOverdue?600:400}}>
+                        {task.due_date}{days !== null ? (isOverdue ? " · overdue" : days === 0 ? " · today" : ` · in ${days}d`) : ""}
+                      </span>
+                    );
+                  })()}
                   {task.note && <span style={{fontSize:11,color:"#6b7280",fontStyle:"italic"}}>· {task.note}</span>}
                 </div>
               </div>
@@ -358,6 +386,22 @@
             ))}
           </div>
         );
+      }
+
+      function daysUntil(dueDateStr) {
+        if (!dueDateStr) return null;
+        const dateMap = {
+          'Immediately': 0, 'This week': 3, 'Book by end Jun 2026': 0,
+          '2 Jul 2026': Math.round((new Date('2026-07-02')-new Date())/86400000),
+          '5 Jul 2026': Math.round((new Date('2026-07-05')-new Date())/86400000),
+          'Week of 7 Jul 2026': Math.round((new Date('2026-07-07')-new Date())/86400000),
+          'Before Jul 2026': Math.round((new Date('2026-06-30')-new Date())/86400000),
+          'July 2026': Math.round((new Date('2026-07-31')-new Date())/86400000),
+          'Before 1 Aug 2026': Math.round((new Date('2026-08-01')-new Date())/86400000),
+          'Before 31 Aug 2026': Math.round((new Date('2026-08-31')-new Date())/86400000),
+          'August 2026': Math.round((new Date('2026-08-31')-new Date())/86400000),
+        };
+        return dateMap[dueDateStr] ?? null;
       }
 
       function App() {
@@ -467,8 +511,12 @@
                     <div style={{fontSize:11,color:"#9ca3af"}}>{completedCount}/{totalCount} done</div>
                   </div>
                 </div>
-                <div style={{height:8,background:"#e5e7eb",borderRadius:4,marginBottom:10,overflow:"hidden"}}>
-                  <div style={{height:"100%",width:progress+"%",background:"linear-gradient(90deg, #93c5fd, #1e6eb5)",borderRadius:4,transition:"width 0.6s ease",minWidth:progress>0?"8px":"0"}} />
+                <div style={{marginBottom:10}}>
+                  <div style={{height:10,background:"#e5e7eb",borderRadius:5,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:progress+"%",background:"linear-gradient(90deg,#60a5fa,#1e6eb5)",borderRadius:5,transition:"width 0.6s ease",minWidth:progress>0?"10px":"0"}} />
+                  </div>
+                  {progress > 0 && <div style={{fontSize:10,color:"#1e6eb5",fontWeight:600,textAlign:"right",marginTop:2}}>{progress}% complete</div>}
+                </div>
                 </div>
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
                   {urgentCount > 0 && (
@@ -481,10 +529,9 @@
                     style={{background:quickFilter==='done'?"#166534":"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='done'?"#fff":"#166534",fontWeight:500,cursor:"pointer"}}>
                     {completedCount} done
                   </button>
-                  <button onClick={() => { setQuickFilter(quickFilter==='remaining'?null:'remaining'); setActiveTab('tasks'); }}
-                    style={{background:quickFilter==='remaining'?"#374151":"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:quickFilter==='remaining'?"#fff":"#6b7280",fontWeight:500,cursor:"pointer"}}>
+                  <span style={{background:"#f8f9fa",border:"1px solid #e5e7eb",borderRadius:20,padding:"3px 10px",fontSize:11,color:"#6b7280",fontWeight:500}}>
                     {totalCount - completedCount} remaining
-                  </button>
+                  </span>
                 </div>
                 <div style={{display:"flex"}}>
                   {[["tasks","Tasks"],["timeline","Timeline"],["housing","Housing"],["budget","Budget"]].map(([key,label]) => (
@@ -522,7 +569,7 @@
                       {activeTasks.length === 0 && doneTasks.length === 0 && quickFilter !== 'done' && (
                         <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No tasks here.</div>
                       )}
-                      {quickFilter === 'done' && (
+                      {quickFilter === 'done' ? (
                         <div style={{display:"flex",flexDirection:"column",gap:8}}>
                           {allFiltered.filter(t=>t.completed).length === 0
                             ? <div style={{textAlign:"center",padding:60,color:"#9ca3af"}}>No completed tasks yet.</div>
@@ -531,12 +578,13 @@
                             ))
                           }
                         </div>
+                      ) : (
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                          {activeTasks.map(task => (
+                            <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
+                          ))}
+                        </div>
                       )}
-                      {quickFilter !== 'done' && <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                        {activeTasks.map(task => (
-                          <TaskCard key={task.id} task={task} onToggle={toggleTask} onEdit={setEditingTask} onAddNote={addNote} />
-                        ))}
-                      </div>}
 
                       {doneTasks.length > 0 && (
                         <div>
